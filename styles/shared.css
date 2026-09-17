@@ -1,0 +1,385 @@
+/* ==========================================================================
+   KNEAD CULINARY LMS - GLOBAL DESIGN SYSTEM & STYLESHEET
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  /* Color Palette */
+  --bg-primary: #FAF4EC;
+  --bg-card: #FFFFFF;
+  --bg-accent-cream: #F5EAE0;
+  --bg-stats: #FDF0E2;
+  --bg-tan-light: #F7EFE5;
+  --bg-dark-slate: #131927;
+  
+  --primary-orange: #FF8A00;
+  --primary-orange-hover: #E07800;
+  --primary-orange-light: #FFF4E5;
+  --primary-green: #2B382B;
+  --primary-green-hover: #1F2B1F;
+  --accent-gold: #D49B42;
+
+  --text-main: #1E2421;
+  --text-muted: #6B726B;
+  --text-light: #9DA39D;
+  --border-light: #EBE3D8;
+  --border-medium: #DDD4C8;
+
+  /* Typography */
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Shadows & Radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.09);
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Resets */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================================================
+   NAVIGATION BAR
+   ========================================================================== */
+.site-header {
+  width: 100%;
+  background-color: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  transition: var(--transition-fast);
+}
+
+.site-header.scrolled {
+  box-shadow: var(--shadow-sm);
+  background-color: rgba(250, 244, 236, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.navBar {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  background-color: var(--text-main);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-orange);
+  font-weight: 800;
+  font-size: 22px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-text h4 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.logo-text h4 span {
+  color: var(--primary-orange);
+}
+
+.logo-text p {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+}
+
+.nav-link {
+  padding: 8px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+}
+
+.nav-link:hover {
+  color: var(--primary-orange);
+}
+
+.nav-link.active {
+  background-color: var(--primary-orange);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(255, 138, 0, 0.3);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  background-color: transparent;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn .badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary-orange);
+  border-radius: 50%;
+}
+
+.login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background-color: var(--bg-dark-slate);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.login-btn:hover {
+  background-color: #242E42;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.mobile-toggle {
+  display: none;
+  font-size: 24px;
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   BUTTONS & BADGES
+   ========================================================================== */
+.btn-primary {
+  padding: 14px 28px;
+  background-color: var(--primary-orange);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(255, 138, 0, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-orange-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 138, 0, 0.45);
+}
+
+.btn-outline {
+  padding: 14px 28px;
+  background-color: transparent;
+  color: var(--primary-orange);
+  border: 1.5px solid var(--primary-orange);
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-orange-light);
+  transform: translateY(-2px);
+}
+
+.btn-dark {
+  padding: 10px 22px;
+  background-color: var(--primary-green);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-dark:hover {
+  background-color: var(--primary-green-hover);
+  transform: translateY(-1px);
+}
+
+.badge-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  background-color: #EFE4D6;
+  color: #4A4035;
+}
+
+.badge-tag.orange {
+  background-color: #FFE6CC;
+  color: #C26300;
+}
+
+.badge-tag.green {
+  background-color: #E2ECE1;
+  color: #2D4C2A;
+}
+
+/* ==========================================================================
+   HERO SECTION
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.site-footer {
+  background-color: #EAE0D3;
+  border-top: 1px solid var(--border-medium);
+  padding: 48px 28px 36px;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+}
+
+.footer-nav a:hover {
+  color: var(--text-main);
+}
+
+.footer-bottom {
+  max-width: 1280px;
+  margin: 0 auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+

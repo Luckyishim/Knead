@@ -1,0 +1,242 @@
+/* Shared layout and components for the member portal pages. */
+.member-page-container {
+  max-width: 1280px;
+  min-height: calc(100vh - 65px);
+  margin: 0 auto;
+  padding: 42px 32px 64px;
+  background: #ffffff;
+}
+
+.member-page-header {
+  margin-bottom: 28px;
+}
+
+.member-page-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.member-page-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.member-card-panel {
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 28px;
+}
+
+.learning-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.course-progress-card {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background: #fffdf9;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+}
+
+.course-thumb {
+  width: 145px;
+  height: 100px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.course-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-category {
+  display: block;
+  color: var(--primary-orange);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.course-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: var(--text-main);
+}
+
+.course-module {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.progress-track {
+  height: 8px;
+  flex: 1;
+  background: #eee3d2;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary-green);
+  border-radius: inherit;
+}
+
+.history-table-wrapper {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.history-table th {
+  padding: 14px 16px;
+  text-align: left;
+  background: #faf4ec;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.history-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+}
+
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.status-pill.passed {
+  background: #e2ece1;
+  color: #2d4c2a;
+}
+
+.status-pill.retry {
+  background: #ffe8d6;
+  color: #c26300;
+}
+
+.saved-recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.member-card-panel .cuisine-grid {
+  display: grid;
+}
+
+.member-card-panel .cuisine-card {
+  display: block;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.member-card-panel .cuisine-card {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.member-card-panel .cuisine-img-box {
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.member-card-panel .cuisine-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.member-card-panel .cuisine-card h4,
+.member-card-panel .cuisine-card p {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.member-card-panel .cuisine-card {
+  padding-bottom: 14px;
+}
+
+.form-control {
+  font: inherit;
+  color: var(--text-main);
+  background: #fff;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--primary-orange) !important;
+  box-shadow: 0 0 0 3px rgba(255, 138, 0, .14);
+}
+
+@media (max-width: 768px) {
+  .member-page-container {
+    padding: 28px 18px 48px;
+  }
+
+  .member-page-header h1 {
+    font-size: 27px;
+  }
+
+  .member-card-panel {
+    padding: 20px;
+  }
+
+  .course-progress-card {
+    flex-direction: column;
+  }
+
+  .course-thumb {
+    width: 100%;
+    height: 180px;
+  }
+
+  .member-card-panel .cuisine-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

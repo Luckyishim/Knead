@@ -1,0 +1,211 @@
+@import url("shared.css");
+@import url("dashboard.css");
+@import url("member.css");
+
+/* ==========================================================================
+   ADMIN PANEL CUSTOM STYLES
+   ========================================================================== */
+
+/* Layout & Base Overrides */
+.dashboard-layout {
+  min-height: calc(100vh - 65px);
+  background-color: #FAF5EF;
+}
+
+.dashboard-sidebar {
+  background-color: #FFFDF9;
+  border-right: 1px solid var(--border-light, #EFE6DC);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+}
+
+.dashboard-main {
+  background-color: #FAF5EF;
+  padding: 32px 40px;
+}
+
+/* Header & Titles */
+.welcome-header {
+  margin-bottom: 24px;
+}
+
+.welcome-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark, #1C1917);
+  letter-spacing: -0.02em;
+}
+
+.welcome-header p {
+  font-size: 14px;
+  color: var(--text-muted, #78716C);
+}
+
+/* Admin Message Alert */
+#pnlAdminMsg {
+  transition: all 0.3s ease;
+  font-size: 14px;
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05));
+}
+
+/* Admin Form Controls & Cards */
+.admin-card {
+  background: #FFFFFF;
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid var(--border-light, #EFE6DC);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
+}
+
+.admin-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark, #1C1917);
+  margin-bottom: 6px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-form-group label,
+label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #44403C;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Styled Inputs, Dropdowns, and Textareas */
+.form-control,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-dark, #1C1917);
+  background-color: #FFFDF9;
+  border: 1.5px solid var(--border-medium, #E7DCCF);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-orange, #FF6B00);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2078716C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+/* Primary Button Hover Styling */
+.btn-primary {
+  background-color: var(--primary-orange, #FF6B00);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 12px;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #E55C00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* User List Table Styling */
+.table,
+#gvUsers {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th,
+#gvUsers th {
+  background-color: #F5EFEB;
+  color: #57534E;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--border-light, #EFE6DC);
+}
+
+.table td,
+#gvUsers td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text-dark, #1C1917);
+  border-bottom: 1px solid var(--border-light, #EFE6DC);
+  vertical-align: middle;
+}
+
+.table tr:last-child td,
+#gvUsers tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td,
+#gvUsers tr:hover td {
+  background-color: #FAF5EF;
+}
+
+/* User Role Badge in Table */
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.role-badge.admin {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.role-badge.member {
+  background-color: #E0E7FF;
+  color: #3730A3;
+}
