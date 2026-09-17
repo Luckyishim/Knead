@@ -12,15 +12,29 @@ namespace KneadLMS
         private int passingScore = 70;
         private int recipeId = 0;
 
+        protected string GetBackUrl()
+        {
+            if (ViewState["RecipeID"] != null && Convert.ToInt32(ViewState["RecipeID"]) > 0)
+            {
+                return "RecipeDetail.aspx?recipeId=" + ViewState["RecipeID"].ToString();
+            }
+            return "Quizzes.aspx";
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["quizId"] != null && int.TryParse(Request.QueryString["quizId"], out quizId))
             {
                 ViewState["QuizID"] = quizId;
             }
+            else if (ViewState["QuizID"] != null)
+            {
+                quizId = Convert.ToInt32(ViewState["QuizID"]);
+            }
             else
             {
-                quizId = ViewState["QuizID"] != null ? Convert.ToInt32(ViewState["QuizID"]) : 1;
+                Response.Redirect("Quizzes.aspx");
+                return;
             }
 
             if (!IsPostBack)
@@ -44,11 +58,17 @@ namespace KneadLMS
                     passingScore = Convert.ToInt32(dt.Rows[0]["PassingScore"]);
                     litPassingScore.Text = passingScore.ToString();
                     ViewState["PassingScore"] = passingScore;
-                    ViewState["RecipeID"] = dt.Rows[0]["RecipeID"];
+                    recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
+                    ViewState["RecipeID"] = recipeId;
+                }
+                else
+                {
+                    Response.Redirect("Quizzes.aspx");
                 }
             }
             catch
             {
+                Response.Redirect("Quizzes.aspx");
             }
         }
 
@@ -77,10 +97,14 @@ namespace KneadLMS
 
                 if (rbl != null)
                 {
-                    rbl.Items.Add(new ListItem(" A. " + drv["OptionA"].ToString(), "A"));
-                    rbl.Items.Add(new ListItem(" B. " + drv["OptionB"].ToString(), "B"));
-                    rbl.Items.Add(new ListItem(" C. " + drv["OptionC"].ToString(), "C"));
-                    rbl.Items.Add(new ListItem(" D. " + drv["OptionD"].ToString(), "D"));
+                    if (drv["OptionA"] != DBNull.Value && !string.IsNullOrWhiteSpace(drv["OptionA"].ToString()))
+                        rbl.Items.Add(new ListItem(" A. " + drv["OptionA"].ToString(), "A"));
+                    if (drv["OptionB"] != DBNull.Value && !string.IsNullOrWhiteSpace(drv["OptionB"].ToString()))
+                        rbl.Items.Add(new ListItem(" B. " + drv["OptionB"].ToString(), "B"));
+                    if (drv["OptionC"] != DBNull.Value && !string.IsNullOrWhiteSpace(drv["OptionC"].ToString()))
+                        rbl.Items.Add(new ListItem(" C. " + drv["OptionC"].ToString(), "C"));
+                    if (drv["OptionD"] != DBNull.Value && !string.IsNullOrWhiteSpace(drv["OptionD"].ToString()))
+                        rbl.Items.Add(new ListItem(" D. " + drv["OptionD"].ToString(), "D"));
                 }
             }
         }

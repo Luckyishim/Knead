@@ -11,7 +11,14 @@ namespace KneadLMS
         {
             if (Session["UserID"] != null)
             {
-                Response.Redirect("UserDashboard.aspx");
+                if (string.Equals(Session["Role"] != null ? Session["Role"].ToString() : "", "Admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    Response.Redirect("AdminPanel.aspx");
+                }
+                else
+                {
+                    Response.Redirect("UserDashboard.aspx");
+                }
             }
         }
 

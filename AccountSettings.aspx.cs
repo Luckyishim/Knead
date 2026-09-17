@@ -34,8 +34,22 @@ namespace KneadLMS
                 if (dt.Rows.Count > 0)
                 {
                     DataRow r = dt.Rows[0];
-                    txtFullName.Text = r["FullName"].ToString();
+                    string fullName = r["FullName"].ToString();
+                    string role = r["Role"].ToString();
+
+                    txtFullName.Text = fullName;
                     txtEmail.Text = r["Email"].ToString();
+
+                    litSidebarName.Text = Server.HtmlEncode(fullName);
+                    litSidebarRole.Text = Server.HtmlEncode(role == "Admin" ? "Administrator" : "Culinary Student");
+
+                    string[] parts = fullName.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    string initials = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0].Substring(0, 1).ToUpper() : "U";
+                    if (parts.Length > 1 && !string.IsNullOrEmpty(parts[parts.Length - 1]))
+                    {
+                        initials += parts[parts.Length - 1].Substring(0, 1).ToUpper();
+                    }
+                    litSidebarInitials.Text = initials;
                 }
             }
             catch
@@ -58,6 +72,18 @@ namespace KneadLMS
 
             try
             {
+                string checkEmailSql = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND UserID <> @UserID";
+                SqlParameter[] checkParams = {
+                    new SqlParameter("@Email", newEmail),
+                    new SqlParameter("@UserID", userId)
+                };
+                int emailCount = Convert.ToInt32(DbHelper.ExecuteScalar(checkEmailSql, checkParams));
+                if (emailCount > 0)
+                {
+                    ShowMessage("This email address is already in use by another account.", false);
+                    return;
+                }
+
                 if (!string.IsNullOrEmpty(newPassword))
                 {
                     if (newPassword.Length < 6)

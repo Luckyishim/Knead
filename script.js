@@ -16,12 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Dynamic Navigation Bar Injector & Handler */
 function initNavigation() {
   const headerContainer = document.querySelector(".site-header") || document.querySelector("nav.navBar");
-  const currentPath = window.location.pathname.split("/").pop() || "Home.html";
+  const currentPath = window.location.pathname.split("/").pop() || "Default.aspx";
 
   if (headerContainer && headerContainer.children.length === 0) {
     headerContainer.innerHTML = `
       <div class="navBar">
-        <a href="Home.html" class="logo">
+        <a href="Default.aspx" class="logo">
           <div class="logo-icon">k.</div>
           <div class="logo-text">
             <h4>knead<span>.</span></h4>
@@ -30,26 +30,20 @@ function initNavigation() {
         </a>
 
         <div class="nav-links">
-          <a class="nav-link ${currentPath.includes("Home.html") || currentPath === "" || currentPath.includes("index.html") ? "active" : ""}" href="Home.html">Home</a>
-          <a class="nav-link ${currentPath.includes("itemList.html") ? "active" : ""}" href="itemList.html">Cuisines</a>
-          <a class="nav-link ${currentPath.includes("Forums.html") ? "active" : ""}" href="Forums.html">Forum</a>
-          <a class="nav-link ${currentPath.includes("About.html") ? "active" : ""}" href="About.html">About</a>
+          <a class="nav-link ${currentPath.includes("Default.aspx") || currentPath === "" || currentPath.includes("Home.aspx") ? "active" : ""}" href="Default.aspx">Home</a>
+          <a class="nav-link ${currentPath.includes("ItemList.aspx") ? "active" : ""}" href="ItemList.aspx">Cuisines</a>
+          <a class="nav-link ${currentPath.includes("Quizzes.aspx") ? "active" : ""}" href="Quizzes.aspx">Quizzes</a>
+          <a class="nav-link ${currentPath.includes("Forums.aspx") ? "active" : ""}" href="Forums.aspx">Forum</a>
+          <a class="nav-link ${currentPath.includes("About.aspx") ? "active" : ""}" href="About.aspx">About</a>
         </div>
 
         <div class="nav-actions">
-          <button class="icon-btn" title="Notifications" onclick="toggleNotifications()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <span class="badge"></span>
-          </button>
-          <a href="login.html" class="login-btn">
+          <a href="Login.aspx" class="login-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            Login/Signup
+            Login / Signup
           </a>
         </div>
       </div>
@@ -149,24 +143,13 @@ function initForumFilters() {
   });
 }
 
-/* Bookmark/Save button toggle */
+/* Bookmark/Save button visual state helper (pure client buttons only) */
 function initBookmarkToggle() {
-  const bookmarkBtns = document.querySelectorAll(".btn-save-recipe, .btn-action-outline");
+  const bookmarkBtns = document.querySelectorAll(".btn-save-recipe-client");
   bookmarkBtns.forEach(btn => {
-    if (btn.innerText.includes("Save")) {
-      btn.addEventListener("click", () => {
-        if (btn.classList.contains("saved")) {
-          btn.classList.remove("saved");
-          btn.style.color = "var(--text-main)";
-          btn.style.borderColor = "var(--border-medium)";
-        } else {
-          btn.classList.add("saved");
-          btn.style.color = "var(--primary-orange)";
-          btn.style.borderColor = "var(--primary-orange)";
-          btn.style.backgroundColor = "var(--primary-orange-light)";
-        }
-      });
-    }
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("saved");
+    });
   });
 }
 
@@ -174,8 +157,12 @@ function initBookmarkToggle() {
 function initVideoPlayer() {
   const playBtn = document.querySelector(".play-button-center");
   if (playBtn) {
-    playBtn.addEventListener("click", () => {
-      alert("Tutorial Video Starting: Traditional Nepali Momos Masterclass!");
+    playBtn.addEventListener("click", (e) => {
+      const href = playBtn.getAttribute("href");
+      if (!href || href === "#" || href.trim() === "") {
+        e.preventDefault();
+        alert("Video guide is not available yet for this recipe.");
+      }
     });
   }
 }

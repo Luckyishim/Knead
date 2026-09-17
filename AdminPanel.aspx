@@ -57,14 +57,9 @@
     <main class="dashboard-main">
       
       <div class="welcome-header" style="display: flex; align-items: center; gap: 16px;">
-        <a href="Default.aspx" class="quiz-back-btn" title="Back to Home" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #F5EFEB; color: #1C1917; text-decoration: none; flex-shrink: 0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </a>
         <div>
           <h1 style="margin: 0;">Admin Management Portal</h1>
-          <p style="margin-top: 4px;">Manage platform cuisines, recipes, quiz questions, and monitor registered learners.</p>
+          <p style="margin-top: 6px;">Manage platform cuisines, recipes, quiz questions, and monitor registered learners.</p>
         </div>
       </div>
 
@@ -111,157 +106,225 @@
 
       <!-- CUISINES & COURSES PANEL -->
       <asp:Panel ID="pnlCuisines" runat="server" Visible="false">
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light); margin-bottom: 24px;">
-          <h3>Add New Cuisine</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Cuisine Name</label>
-              <asp:TextBox ID="txtNewCuisineName" runat="server" CssClass="form-control" placeholder="e.g. Thai" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
-            </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Image URL</label>
-              <asp:TextBox ID="txtNewCuisineImg" runat="server" CssClass="form-control" placeholder="images/momo_dish.jpg" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Description</label>
-              <asp:TextBox ID="txtNewCuisineDesc" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
-            </div>
+        <div class="admin-card">
+          <div class="section-header">
+            <h3>Add New Cuisine</h3>
+            <p class="muted">Create a cuisine and attach a representative image.</p>
           </div>
-          <asp:Button ID="btnAddCuisine" runat="server" Text="Add Cuisine" OnClick="btnAddCuisine_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
-        </div>
 
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light);">
-          <h3>Add Course Type</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Select Cuisine</label>
-              <asp:DropDownList ID="ddlCourseCuisine" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;"></asp:DropDownList>
+          <div class="form-grid" style="margin-top: 12px;">
+            <div class="admin-form-group">
+              <label>Cuisine Name</label>
+              <asp:TextBox ID="txtNewCuisineName" runat="server" CssClass="form-control" placeholder="e.g. Thai"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Course Type Name</label>
-              <asp:TextBox ID="txtCourseTypeName" runat="server" CssClass="form-control" placeholder="e.g. Appetizer" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Image URL</label>
+              <asp:TextBox ID="txtNewCuisineImg" runat="server" CssClass="form-control" placeholder="images/momo_dish.jpg"></asp:TextBox>
+            </div>
+
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Description (optional)</label>
+              <asp:TextBox ID="txtNewCuisineDesc" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control"></asp:TextBox>
             </div>
           </div>
-          <asp:Button ID="btnAddCourseType" runat="server" Text="Add Course Type" OnClick="btnAddCourseType_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
+
+          <asp:Button ID="btnAddCuisine" runat="server" Text="Add Cuisine" OnClick="btnAddCuisine_Click" CssClass="btn-primary" Style="margin-top: 16px;" />
+
+          <hr style="margin: 22px 0; border:none; border-top:1px solid var(--border-light);" />
+
+          <div class="section-header" style="margin-bottom:12px;">
+            <h3>Add Course Type</h3>
+            <p class="muted">Add course types tied to a cuisine (e.g., Appetizer, Main, Dessert).</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="admin-form-group">
+              <label>Select Cuisine</label>
+              <asp:DropDownList ID="ddlCourseCuisine" runat="server" CssClass="form-control"></asp:DropDownList>
+            </div>
+            <div class="admin-form-group">
+              <label>Course Type Name</label>
+              <asp:TextBox ID="txtCourseTypeName" runat="server" CssClass="form-control" placeholder="e.g. Appetizer"></asp:TextBox>
+            </div>
+          </div>
+          <asp:Button ID="btnAddCourseType" runat="server" Text="Add Course Type" OnClick="btnAddCourseType_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+
+          <div class="continue-learning-section" style="margin-top: 28px;">
+            <h3>Existing Cuisines</h3>
+            <div class="ingredients-box">
+              <asp:GridView ID="gvAdminCuisines" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+                <Columns>
+                  <asp:BoundField DataField="CuisineID" HeaderText="ID" />
+                  <asp:BoundField DataField="CuisineName" HeaderText="CUISINE" />
+                  <asp:BoundField DataField="CourseCount" HeaderText="COURSES" />
+                  <asp:BoundField DataField="Description" HeaderText="DESCRIPTION" />
+                </Columns>
+              </asp:GridView>
+            </div>
+          </div>
         </div>
       </asp:Panel>
 
       <!-- RECIPES & STEPS PANEL -->
       <asp:Panel ID="pnlRecipes" runat="server" Visible="false">
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light); margin-bottom: 24px;">
-          <h3>Create New Recipe</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Course Type</label>
-              <asp:DropDownList ID="ddlRecipeCourseType" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;"></asp:DropDownList>
+        <div class="admin-card">
+          <div class="section-header">
+            <h3>Create New Recipe</h3>
+            <p class="muted">Add recipes and link them to cuisines and course types.</p>
+          </div>
+
+          <div class="form-grid" style="margin-top: 12px;">
+            <div class="admin-form-group">
+              <label>Course Type</label>
+              <asp:DropDownList ID="ddlRecipeCourseType" runat="server" CssClass="form-control"></asp:DropDownList>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Recipe Title</label>
-              <asp:TextBox ID="txtRecipeTitle" runat="server" CssClass="form-control" placeholder="e.g. Spicy Pad Thai" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Recipe Title</label>
+              <asp:TextBox ID="txtRecipeTitle" runat="server" CssClass="form-control" placeholder="e.g. Spicy Pad Thai"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Duration (minutes)</label>
-              <asp:TextBox ID="txtRecipeDuration" runat="server" TextMode="Number" CssClass="form-control" placeholder="30" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Duration (minutes)</label>
+              <asp:TextBox ID="txtRecipeDuration" runat="server" TextMode="Number" CssClass="form-control" placeholder="30"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Difficulty</label>
-              <asp:DropDownList ID="ddlRecipeDifficulty" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;">
+
+            <div class="admin-form-group">
+              <label>Difficulty</label>
+              <asp:DropDownList ID="ddlRecipeDifficulty" runat="server" CssClass="form-control">
                 <asp:ListItem>Beginner</asp:ListItem>
                 <asp:ListItem Selected="True">Intermediate</asp:ListItem>
                 <asp:ListItem>Advanced</asp:ListItem>
               </asp:DropDownList>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Thumbnail URL</label>
-              <asp:TextBox ID="txtRecipeThumb" runat="server" CssClass="form-control" placeholder="images/momo_dish.jpg" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Thumbnail URL</label>
+              <asp:TextBox ID="txtRecipeThumb" runat="server" CssClass="form-control" placeholder="images/momo_dish.jpg"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Video URL</label>
-              <asp:TextBox ID="txtRecipeVideo" runat="server" CssClass="form-control" placeholder="https://youtube.com/..." Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Video URL</label>
+              <asp:TextBox ID="txtRecipeVideo" runat="server" CssClass="form-control" placeholder="https://youtube.com/..." ></asp:TextBox>
             </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Description</label>
-              <asp:TextBox ID="txtRecipeDesc" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Description</label>
+              <asp:TextBox ID="txtRecipeDesc" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control"></asp:TextBox>
             </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Ingredients (Separated by | pipe symbol)</label>
-              <asp:TextBox ID="txtRecipeIngredients" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" placeholder="2 cups Flour|1 tsp Salt|3 Eggs" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Ingredients (Separated by | pipe symbol)</label>
+              <asp:TextBox ID="txtRecipeIngredients" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" placeholder="2 cups Flour|1 tsp Salt|3 Eggs"></asp:TextBox>
             </div>
           </div>
-          <asp:Button ID="btnAddRecipe" runat="server" Text="Save Recipe" OnClick="btnAddRecipe_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
+
+          <asp:Button ID="btnAddRecipe" runat="server" Text="Save Recipe" OnClick="btnAddRecipe_Click" CssClass="btn-primary" Style="margin-top: 16px;" />
         </div>
 
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light);">
-          <h3>Add Recipe Step</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Select Recipe</label>
-              <asp:DropDownList ID="ddlStepRecipe" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;"></asp:DropDownList>
+        <div class="admin-card" style="margin-top:18px;">
+          <div class="section-header">
+            <h3>Add Recipe Step</h3>
+            <p class="muted">Add ordered instructions for a recipe.</p>
+          </div>
+
+          <div class="form-grid" style="margin-top:12px;">
+            <div class="admin-form-group">
+              <label>Select Recipe</label>
+              <asp:DropDownList ID="ddlStepRecipe" runat="server" CssClass="form-control"></asp:DropDownList>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Step Number</label>
-              <asp:TextBox ID="txtStepNumber" runat="server" TextMode="Number" CssClass="form-control" placeholder="1" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Step Number</label>
+              <asp:TextBox ID="txtStepNumber" runat="server" TextMode="Number" CssClass="form-control" placeholder="1"></asp:TextBox>
             </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Instruction Text</label>
-              <asp:TextBox ID="txtStepInstruction" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Instruction Text</label>
+              <asp:TextBox ID="txtStepInstruction" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control"></asp:TextBox>
             </div>
           </div>
-          <asp:Button ID="btnAddStep" runat="server" Text="Add Step" OnClick="btnAddStep_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
+          <asp:Button ID="btnAddStep" runat="server" Text="Add Step" OnClick="btnAddStep_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+        </div>
+
+        <div class="continue-learning-section" style="margin-top: 28px;">
+          <h3>Existing Recipes</h3>
+          <div class="ingredients-box">
+            <asp:GridView ID="gvAdminRecipes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+              <Columns>
+                <asp:BoundField DataField="RecipeID" HeaderText="ID" />
+                <asp:BoundField DataField="RecipeTitle" HeaderText="TITLE" />
+                <asp:BoundField DataField="CuisineName" HeaderText="CUISINE" />
+                <asp:BoundField DataField="CourseTypeName" HeaderText="COURSE" />
+                <asp:BoundField DataField="Duration" HeaderText="DURATION (MIN)" />
+                <asp:BoundField DataField="Difficulty" HeaderText="DIFFICULTY" />
+              </Columns>
+            </asp:GridView>
+          </div>
         </div>
       </asp:Panel>
 
       <!-- QUIZZES & QUESTIONS PANEL -->
       <asp:Panel ID="pnlQuizzes" runat="server" Visible="false">
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light); margin-bottom: 24px;">
-          <h3>Create Quiz</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Select Recipe</label>
-              <asp:DropDownList ID="ddlQuizRecipe" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;"></asp:DropDownList>
+        <div class="admin-card">
+          <div class="section-header">
+            <h3>Create Quiz</h3>
+            <p class="muted">Associate a quiz with a recipe and set passing criteria.</p>
+          </div>
+
+          <div class="form-grid" style="margin-top:12px;">
+            <div class="admin-form-group">
+              <label>Select Recipe</label>
+              <asp:DropDownList ID="ddlQuizRecipe" runat="server" CssClass="form-control"></asp:DropDownList>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Quiz Title</label>
-              <asp:TextBox ID="txtQuizTitle" runat="server" CssClass="form-control" placeholder="e.g. Pad Thai Technique Quiz" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Quiz Title</label>
+              <asp:TextBox ID="txtQuizTitle" runat="server" CssClass="form-control" placeholder="e.g. Pad Thai Technique Quiz"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Passing Score %</label>
-              <asp:TextBox ID="txtPassingScore" runat="server" TextMode="Number" Text="70" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Passing Score %</label>
+              <asp:TextBox ID="txtPassingScore" runat="server" TextMode="Number" Text="70" CssClass="form-control"></asp:TextBox>
             </div>
           </div>
-          <asp:Button ID="btnAddQuiz" runat="server" Text="Create Quiz" OnClick="btnAddQuiz_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
+          <asp:Button ID="btnAddQuiz" runat="server" Text="Create Quiz" OnClick="btnAddQuiz_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
         </div>
 
-        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-light);">
-          <h3>Add Question to Quiz</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Select Quiz</label>
-              <asp:DropDownList ID="ddlQuestionQuiz" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;"></asp:DropDownList>
+        <div class="admin-card" style="margin-top: 18px;">
+          <div class="section-header">
+            <h3>Add Question to Quiz</h3>
+            <p class="muted">Provide multiple choice questions and select the correct answer.</p>
+          </div>
+
+          <div class="form-grid" style="margin-top:12px;">
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Select Quiz</label>
+              <asp:DropDownList ID="ddlQuestionQuiz" runat="server" CssClass="form-control"></asp:DropDownList>
             </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="font-weight: 600; font-size: 13px;">Question Text</label>
-              <asp:TextBox ID="txtQuestionText" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label>Question Text</label>
+              <asp:TextBox ID="txtQuestionText" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Option A</label>
-              <asp:TextBox ID="txtOptionA" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+
+            <div class="admin-form-group">
+              <label>Option A</label>
+              <asp:TextBox ID="txtOptionA" runat="server" CssClass="form-control"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Option B</label>
-              <asp:TextBox ID="txtOptionB" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Option B</label>
+              <asp:TextBox ID="txtOptionB" runat="server" CssClass="form-control"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Option C</label>
-              <asp:TextBox ID="txtOptionC" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Option C</label>
+              <asp:TextBox ID="txtOptionC" runat="server" CssClass="form-control"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Option D</label>
-              <asp:TextBox ID="txtOptionD" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px; box-sizing: border-box;"></asp:TextBox>
+            <div class="admin-form-group">
+              <label>Option D</label>
+              <asp:TextBox ID="txtOptionD" runat="server" CssClass="form-control"></asp:TextBox>
             </div>
-            <div>
-              <label style="font-weight: 600; font-size: 13px;">Correct Answer Choice</label>
-              <asp:DropDownList ID="ddlCorrectAns" runat="server" CssClass="form-control" Style="width: 100%; padding: 8px;">
+
+            <div class="admin-form-group">
+              <label>Correct Answer Choice</label>
+              <asp:DropDownList ID="ddlCorrectAns" runat="server" CssClass="form-control">
                 <asp:ListItem Value="A">Option A</asp:ListItem>
                 <asp:ListItem Value="B">Option B</asp:ListItem>
                 <asp:ListItem Value="C">Option C</asp:ListItem>
@@ -269,7 +332,22 @@
               </asp:DropDownList>
             </div>
           </div>
-          <asp:Button ID="btnAddQuestion" runat="server" Text="Add Question" OnClick="btnAddQuestion_Click" CssClass="btn-primary" Style="margin-top: 16px; padding: 10px 20px; cursor: pointer;" />
+          <asp:Button ID="btnAddQuestion" runat="server" Text="Add Question" OnClick="btnAddQuestion_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+        </div>
+
+        <div class="continue-learning-section" style="margin-top: 28px;">
+          <h3>Existing Quizzes</h3>
+          <div class="ingredients-box">
+            <asp:GridView ID="gvAdminQuizzes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+              <Columns>
+                <asp:BoundField DataField="QuizID" HeaderText="ID" />
+                <asp:BoundField DataField="QuizTitle" HeaderText="QUIZ TITLE" />
+                <asp:BoundField DataField="RecipeTitle" HeaderText="RECIPE" />
+                <asp:BoundField DataField="PassingScore" HeaderText="PASSING SCORE (%)" />
+                <asp:BoundField DataField="QuestionCount" HeaderText="QUESTIONS" />
+              </Columns>
+            </asp:GridView>
+          </div>
         </div>
       </asp:Panel>
 

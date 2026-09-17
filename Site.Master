@@ -26,6 +26,7 @@
                 <div class="nav-links">
                     <a class="nav-link <%= GetNavActiveClass("Default.aspx") %>" href="Default.aspx">Home</a>
                     <a class="nav-link <%= GetNavActiveClass("ItemList.aspx") %>" href="ItemList.aspx">Cuisines</a>
+                    <a class="nav-link <%= GetNavActiveClass("Quizzes.aspx") %>" href="Quizzes.aspx">Quizzes</a>
                     <a class="nav-link <%= GetNavActiveClass("Forums.aspx") %>" href="Forums.aspx">Forum</a>
                     <a class="nav-link <%= GetNavActiveClass("About.aspx") %>" href="About.aspx">About</a>
                 </div>
@@ -73,10 +74,11 @@
                 </a>
 
                 <nav class="footer-nav">
-                    <a href="ItemList.aspx">Site Map</a>
-                    <a href="About.aspx">Contact Us</a>
-                    <a href="About.aspx#privacy">Privacy Policy</a>
-                    <a href="About.aspx#terms">Terms of Service</a>
+                    <a href="ItemList.aspx">Cuisines</a>
+                    <a href="Quizzes.aspx">Quizzes</a>
+                    <a href="Forums.aspx">Forum</a>
+                    <a href="About.aspx">About Us</a>
+                    <a href="About.aspx#contact">Contact Us</a>
                 </nav>
             </div>
 

@@ -81,7 +81,48 @@
     <Content Include="AccountSettings.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Code\DbHelper.cs" />
+    <Compile Include="AccountSettings.aspx.designer.cs">
+      <DependentUpon>AccountSettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel.aspx.designer.cs">
+      <DependentUpon>AdminPanel.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ForumDetail.aspx.designer.cs">
+      <DependentUpon>ForumDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Forums.aspx.designer.cs">
+      <DependentUpon>Forums.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ItemList.aspx.designer.cs">
+      <DependentUpon>ItemList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MyProgress.aspx.designer.cs">
+      <DependentUpon>MyProgress.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuizDetail.aspx.designer.cs">
+      <DependentUpon>QuizDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuizHistory.aspx.designer.cs">
+      <DependentUpon>QuizHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quizzes.aspx.designer.cs">
+      <DependentUpon>Quizzes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeDetail.aspx.designer.cs">
+      <DependentUpon>RecipeDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SavedRecipes.aspx.designer.cs">
+      <DependentUpon>SavedRecipes.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -126,6 +167,9 @@
       <DependentUpon>QuizDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Site.master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
     <Compile Include="UserDashboard.aspx.cs">
       <DependentUpon>UserDashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -162,6 +206,12 @@
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="UserDashboard.aspx.designer.cs">
+      <DependentUpon>UserDashboard.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Code\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

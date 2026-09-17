@@ -15,9 +15,14 @@ namespace KneadLMS
             {
                 ViewState["TopicID"] = topicId;
             }
+            else if (ViewState["TopicID"] != null)
+            {
+                topicId = Convert.ToInt32(ViewState["TopicID"]);
+            }
             else
             {
-                topicId = ViewState["TopicID"] != null ? Convert.ToInt32(ViewState["TopicID"]) : 1;
+                Response.Redirect("Forums.aspx");
+                return;
             }
 
             if (!IsPostBack)

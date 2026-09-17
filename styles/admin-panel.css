@@ -18,6 +18,12 @@
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
 }
 
+.dashboard-sidebar {
+  width: 260px;
+  min-width: 220px;
+  padding: 24px 18px;
+}
+
 .dashboard-main {
   background-color: #FAF5EF;
   padding: 32px 40px;
@@ -68,6 +74,30 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* grid helper for forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.section-header .muted {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 880px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-sidebar { display: none; }
 }
 
 .admin-form-group label,

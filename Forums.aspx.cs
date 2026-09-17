@@ -8,11 +8,37 @@ namespace KneadLMS
 {
     public partial class Forums : Page
     {
+        protected string GetForumBackUrl()
+        {
+            if (Request.QueryString["recipeId"] != null)
+            {
+                int rId;
+                if (int.TryParse(Request.QueryString["recipeId"], out rId) && rId > 0)
+                {
+                    return "RecipeDetail.aspx?recipeId=" + rId;
+                }
+            }
+            return "Default.aspx";
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 LoadRecipesDropdown();
+
+                if (Request.QueryString["recipeId"] != null)
+                {
+                    int rId;
+                    if (int.TryParse(Request.QueryString["recipeId"], out rId))
+                    {
+                        if (ddlRecipeSelect.Items.FindByValue(rId.ToString()) != null)
+                        {
+                            ddlRecipeSelect.SelectedValue = rId.ToString();
+                        }
+                    }
+                }
+
                 LoadTopics();
             }
         }
@@ -26,11 +52,11 @@ namespace KneadLMS
                 ddlRecipeSelect.DataTextField = "RecipeTitle";
                 ddlRecipeSelect.DataValueField = "RecipeID";
                 ddlRecipeSelect.DataBind();
-                ddlRecipeSelect.Items.Insert(0, new ListItem("-- General Discussion --", "0"));
+                ddlRecipeSelect.Items.Insert(0, new ListItem("-- All Discussion Topics --", "0"));
             }
             catch
             {
-                ddlRecipeSelect.Items.Insert(0, new ListItem("-- General Discussion --", "0"));
+                ddlRecipeSelect.Items.Insert(0, new ListItem("-- All Discussion Topics --", "0"));
             }
         }
 
@@ -48,9 +74,16 @@ namespace KneadLMS
 
                 System.Collections.Generic.List<SqlParameter> pList = new System.Collections.Generic.List<SqlParameter>();
 
+                int filterRecipeId = 0;
+                if (int.TryParse(ddlRecipeSelect.SelectedValue, out filterRecipeId) && filterRecipeId > 0)
+                {
+                    sql += " AND ft.RecipeID = @RecipeID";
+                    pList.Add(new SqlParameter("@RecipeID", filterRecipeId));
+                }
+
                 if (!string.IsNullOrEmpty(search))
                 {
-                    sql += " AND (ft.TopicTitle LIKE @Search OR u.FullName LIKE @Search)";
+                    sql += " AND (ft.TopicTitle LIKE @Search OR u.FullName LIKE @Search OR r.RecipeTitle LIKE @Search)";
                     pList.Add(new SqlParameter("@Search", "%" + search + "%"));
                 }
 
@@ -69,11 +102,17 @@ namespace KneadLMS
                     pnlNoTopics.Visible = true;
                 }
             }
-      catch (Exception ex)
-{
-    pnlNoTopics.Visible = true;
-    pnlNoTopics.Controls.Add(new LiteralControl("<p style='color:red'>" + Server.HtmlEncode(ex.Message) + "</p>"));
-}
+            catch (Exception ex)
+            {
+                pnlNoTopics.Visible = true;
+                pnlNoTopics.Controls.Clear();
+                pnlNoTopics.Controls.Add(new LiteralControl("<p style='color:red'>" + Server.HtmlEncode(ex.Message) + "</p>"));
+            }
+        }
+
+        protected void ddlRecipeSelect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadTopics();
         }
 
         protected void btnSearch_Click(object sender, EventArgs e)

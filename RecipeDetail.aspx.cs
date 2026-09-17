@@ -52,14 +52,19 @@ namespace KneadLMS
                     litCourseBadge.Text = Server.HtmlEncode(row["CourseTypeName"].ToString());
                     litDifficultyBadge.Text = Server.HtmlEncode(row["Difficulty"].ToString());
 
-                    litBreadcrumbCuisine.Text = Server.HtmlEncode(row["CuisineName"].ToString());
+                    lnkBreadcrumbCuisine.Text = Server.HtmlEncode(row["CuisineName"].ToString());
+                    lnkBreadcrumbCuisine.NavigateUrl = "ItemList.aspx?cuisineId=" + row["CuisineID"].ToString();
                     litBreadcrumbCourse.Text = Server.HtmlEncode(row["CourseTypeName"].ToString());
                     ViewState["CuisineID"] = row["CuisineID"];
 
                     string thumb = row["Thumbnail"].ToString();
                     imgThumbnail.ImageUrl = string.IsNullOrEmpty(thumb) ? "images/momo_dish.jpg" : thumb;
 
-                    ViewState["VideoURL"] = string.IsNullOrEmpty(row["VideoURL"].ToString()) ? "#" : row["VideoURL"].ToString();
+                    string videoUrl = row["VideoURL"] != null ? row["VideoURL"].ToString() : "";
+                    ViewState["VideoURL"] = string.IsNullOrEmpty(videoUrl) ? "#" : videoUrl;
+                    lnkPlayVideo.NavigateUrl = ViewState["VideoURL"].ToString();
+                    lnkForumDiscussions.NavigateUrl = "Forums.aspx?recipeId=" + recipeId.ToString();
+
                     litVideoTitle.Text = Server.HtmlEncode(row["RecipeTitle"].ToString());
                     litVideoDuration.Text = row["Duration"].ToString() + ":00";
 
@@ -211,6 +216,7 @@ namespace KneadLMS
                 pnlProgressFill.Style["width"] = "100%";
                 btnMarkComplete.Text = "Completed ✓";
                 lblStatusMessage.Text = "Congratulations! Lesson marked as completed.";
+                CheckUserProgressAndFavorites();
             }
             catch (Exception ex)
             {
@@ -240,8 +246,6 @@ namespace KneadLMS
                     SqlParameter[] pDel = { new SqlParameter("@FavoriteID", Convert.ToInt32(favIdObj)) };
                     DbHelper.ExecuteNonQuery(delSql, pDel);
 
-                    btnSaveFavorite.Text = "Save";
-                    btnSaveFavorite.Style["color"] = "inherit";
                     lblStatusMessage.Text = "Removed from your saved recipes.";
                 }
                 else
@@ -250,10 +254,9 @@ namespace KneadLMS
                     SqlParameter[] pIns = { new SqlParameter("@UserID", userId), new SqlParameter("@RecipeID", recipeId) };
                     DbHelper.ExecuteNonQuery(insSql, pIns);
 
-                    btnSaveFavorite.Text = "Saved ♥";
-                    btnSaveFavorite.Style["color"] = "var(--primary-orange)";
                     lblStatusMessage.Text = "Added to your saved recipes!";
                 }
+                CheckUserProgressAndFavorites();
             }
             catch (Exception ex)
             {

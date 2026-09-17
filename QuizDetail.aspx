@@ -13,7 +13,7 @@
 
     <!-- Top Minimal Header -->
     <div class="quiz-top-bar">
-      <a href="Quizzes.aspx" class="quiz-back-btn" title="Back to Quizzes">
+      <a href='<%= GetBackUrl() %>' class="quiz-back-btn" title="Back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>

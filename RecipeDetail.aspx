@@ -11,7 +11,7 @@
     <div class="breadcrumb">
       <a href="ItemList.aspx">← Cuisines</a>
       <span>›</span>
-      <a href='<%# "ItemList.aspx?cuisineId=" + ViewState["CuisineID"] %>'><asp:Literal ID="litBreadcrumbCuisine" runat="server">Cuisine</asp:Literal></a>
+      <asp:HyperLink ID="lnkBreadcrumbCuisine" runat="server">Cuisine</asp:HyperLink>
       <span>›</span>
       <span><asp:Literal ID="litBreadcrumbCourse" runat="server">Course</asp:Literal></span>
     </div>
@@ -57,11 +57,11 @@
         <asp:Literal ID="litVideoTitle" runat="server">Recipe Video Guide</asp:Literal><br/>
         <span style="font-size: 18px; font-weight: 600; text-transform: none; opacity: 0.9;">Authentic Culinary Technique</span>
       </div>
-      <a href='<%# ViewState["VideoURL"] %>' target="_blank" class="play-button-center" title="Play Video Masterclass">
+      <asp:HyperLink ID="lnkPlayVideo" runat="server" Target="_blank" CssClass="play-button-center" ToolTip="Play Video Masterclass">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
           <polygon points="5 3 19 12 5 21 5 3"></polygon>
         </svg>
-      </a>
+      </asp:HyperLink>
       <div class="video-duration-badge"><asp:Literal ID="litVideoDuration" runat="server">12:45</asp:Literal></div>
     </div>
 
@@ -149,7 +149,7 @@
         <div id="forum" class="tab-pane" style="display: none;">
           <h3>Recipe Discussions</h3>
           <p style="margin-top: 8px; color: var(--text-muted);">Connect with fellow students learning this recipe.</p>
-          <a href='<%# "Forums.aspx?recipeId=" + ViewState["RecipeID"] %>' class="btn-primary" style="display: inline-block; margin-top: 16px; text-decoration: none;">View Discussion Threads</a>
+          <asp:HyperLink ID="lnkForumDiscussions" runat="server" CssClass="btn-primary" Style="display: inline-block; margin-top: 16px; text-decoration: none;" Text="View Discussion Threads"></asp:HyperLink>
         </div>
 
       </div>

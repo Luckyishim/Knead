@@ -144,13 +144,12 @@
                     <p class="course-module"><%# Convert.ToBoolean(Eval("IsCompleted")) ? "Status: Completed ✓" : "Status: In Progress" %></p>
                     <div class="progress-bar-container">
                       <div class="progress-track">
-                        <div class="progress-fill" style='<%# Convert.ToBoolean(Eval("IsCompleted")) ? "width: 100%;" : "width: 65%;" %>'></div>
+                        <div class="progress-fill" style='<%# Convert.ToBoolean(Eval("IsCompleted")) ? "width: 100%;" : "width: 50%;" %>'></div>
                       </div>
-                      <a href='<%# "RecipeDetail.aspx?recipeId=" + Eval("RecipeID") %>' class="btn-dark">Resume</a>
+                      <a href='<%# "RecipeDetail.aspx?recipeId=" + Eval("RecipeID") %>' class="btn-dark"><%# Convert.ToBoolean(Eval("IsCompleted")) ? "Review" : "Resume" %></a>
                     </div>
                     <div class="progress-meta">
-                      <span><%# Convert.ToBoolean(Eval("IsCompleted")) ? "100% Completed" : "65% Completed" %></span>
-                      <span>15 mins left</span>
+                      <span><%# Convert.ToBoolean(Eval("IsCompleted")) ? "100% Completed" : "In Progress" %></span>
                     </div>
                   </div>
                 </div>
@@ -167,46 +166,23 @@
         <div class="progress-by-cuisine-widget">
           <h4>Progress by Cuisine</h4>
           
-          <div class="cuisine-progress-item">
-            <div class="cuisine-progress-label">
-              <span>Nepali</span>
-              <span>80%</span>
-            </div>
-            <div class="cuisine-progress-track">
-              <div class="cuisine-progress-fill" style="width: 80%;"></div>
-            </div>
-          </div>
+          <asp:Repeater ID="rptCuisineProgress" runat="server">
+            <ItemTemplate>
+              <div class="cuisine-progress-item">
+                <div class="cuisine-progress-label">
+                  <span><%# Eval("CuisineName") %></span>
+                  <span><%# Eval("ProgressPercent") %>%</span>
+                </div>
+                <div class="cuisine-progress-track">
+                  <div class="cuisine-progress-fill" style='width: <%# Eval("ProgressPercent") %>%;'></div>
+                </div>
+              </div>
+            </ItemTemplate>
+          </asp:Repeater>
 
-          <div class="cuisine-progress-item">
-            <div class="cuisine-progress-label">
-              <span>Italian</span>
-              <span>45%</span>
-            </div>
-            <div class="cuisine-progress-track">
-              <div class="cuisine-progress-fill" style="width: 45%;"></div>
-            </div>
-          </div>
-
-          <div class="cuisine-progress-item">
-            <div class="cuisine-progress-label">
-              <span>Asian</span>
-              <span>15%</span>
-            </div>
-            <div class="cuisine-progress-track">
-              <div class="cuisine-progress-fill" style="width: 15%;"></div>
-            </div>
-          </div>
-
-          <div class="cuisine-progress-item">
-            <div class="cuisine-progress-label">
-              <span>Baking Essentials</span>
-              <span>60%</span>
-            </div>
-            <div class="cuisine-progress-track">
-              <div class="cuisine-progress-fill" style="width: 60%;"></div>
-            </div>
-          </div>
-
+          <asp:Panel ID="pnlNoCuisineProgress" runat="server" Visible="false">
+            <p style="font-size: 13px; color: var(--text-muted);">No cuisine progress recorded yet.</p>
+          </asp:Panel>
         </div>
 
       </div>

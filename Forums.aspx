@@ -7,7 +7,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
   <!-- Forum Title Header with Back Arrow -->
   <div class="forum-header" style="padding: 24px 0 12px; display: flex; align-items: center; gap: 16px;">
-    <a href="Default.aspx" class="quiz-back-btn" title="Back to Home" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #F5EFEB; color: #1C1917; text-decoration: none; flex-shrink: 0;">
+    <a href='<%= GetForumBackUrl() %>' class="quiz-back-btn" title="Back" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #F5EFEB; color: #1C1917; text-decoration: none; flex-shrink: 0;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
       </svg>
@@ -70,7 +70,7 @@
           <asp:TextBox ID="txtSearchTopic" runat="server" placeholder="Search discussions..." AutoPostBack="true" OnTextChanged="btnSearch_Click"></asp:TextBox>
         </div>
 
-        <asp:DropDownList ID="ddlRecipeSelect" runat="server" CssClass="form-control" Style="padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-medium);">
+        <asp:DropDownList ID="ddlRecipeSelect" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlRecipeSelect_SelectedIndexChanged" CssClass="form-control" Style="padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-medium);">
         </asp:DropDownList>
         
         <asp:Button ID="btnOpenNewTopic" runat="server" Text="+ New Thread" OnClick="btnOpenNewTopic_Click" CssClass="btn-primary" Style="padding: 10px 20px;" />

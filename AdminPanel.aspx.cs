@@ -167,6 +167,56 @@ namespace KneadLMS
             btnNavCuisines.CssClass  = "menu-item" + (tabName == "cuisines"  ? " active" : "");
             btnNavRecipes.CssClass   = "menu-item" + (tabName == "recipes"   ? " active" : "");
             btnNavQuizzes.CssClass   = "menu-item" + (tabName == "quizzes"   ? " active" : "");
+
+            if (tabName == "cuisines") LoadCuisinesTable();
+            if (tabName == "recipes") LoadRecipesTable();
+            if (tabName == "quizzes") LoadQuizzesTable();
+        }
+
+        private void LoadCuisinesTable()
+        {
+            try
+            {
+                DataTable dt = DbHelper.ExecuteQuery(
+                    @"SELECT c.CuisineID, c.CuisineName, c.Description, 
+                             (SELECT COUNT(*) FROM CourseType ct WHERE ct.CuisineID = c.CuisineID) AS CourseCount
+                      FROM Cuisine c ORDER BY c.CuisineID DESC");
+                gvAdminCuisines.DataSource = dt;
+                gvAdminCuisines.DataBind();
+            }
+            catch { }
+        }
+
+        private void LoadRecipesTable()
+        {
+            try
+            {
+                DataTable dt = DbHelper.ExecuteQuery(
+                    @"SELECT r.RecipeID, r.RecipeTitle, r.Duration, r.Difficulty, c.CuisineName, ct.CourseTypeName
+                      FROM Recipe r
+                      INNER JOIN CourseType ct ON r.CourseTypeID = ct.CourseTypeID
+                      INNER JOIN Cuisine c ON ct.CuisineID = c.CuisineID
+                      ORDER BY r.RecipeID DESC");
+                gvAdminRecipes.DataSource = dt;
+                gvAdminRecipes.DataBind();
+            }
+            catch { }
+        }
+
+        private void LoadQuizzesTable()
+        {
+            try
+            {
+                DataTable dt = DbHelper.ExecuteQuery(
+                    @"SELECT q.QuizID, q.QuizTitle, q.PassingScore, r.RecipeTitle,
+                             (SELECT COUNT(*) FROM QuizQuestion qq WHERE qq.QuizID = q.QuizID) AS QuestionCount
+                      FROM Quiz q
+                      INNER JOIN Recipe r ON q.RecipeID = r.RecipeID
+                      ORDER BY q.QuizID DESC");
+                gvAdminQuizzes.DataSource = dt;
+                gvAdminQuizzes.DataBind();
+            }
+            catch { }
         }
 
         protected void btnAddCuisine_Click(object sender, EventArgs e)

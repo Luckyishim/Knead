@@ -24,7 +24,19 @@ namespace KneadLMS
 
         private void LoadUserInfo()
         {
-            // Info check (no sidebar controls needed)
+            string fullName = Session["FullName"] != null ? Session["FullName"].ToString() : "Member";
+            string role = Session["Role"] != null ? Session["Role"].ToString() : "Member";
+
+            litSidebarName.Text = Server.HtmlEncode(fullName);
+            litSidebarRole.Text = Server.HtmlEncode(role == "Admin" ? "Administrator" : "Culinary Student");
+
+            string[] parts = fullName.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string initials = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0].Substring(0, 1).ToUpper() : "U";
+            if (parts.Length > 1 && !string.IsNullOrEmpty(parts[parts.Length - 1]))
+            {
+                initials += parts[parts.Length - 1].Substring(0, 1).ToUpper();
+            }
+            litSidebarInitials.Text = initials;
         }
 
         private void LoadUserProgress()

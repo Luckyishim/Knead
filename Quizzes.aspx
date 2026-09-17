@@ -32,6 +32,11 @@
           </div>
         </ItemTemplate>
       </asp:Repeater>
+
+      <asp:Panel ID="pnlNoQuizzes" runat="server" Visible="false" Style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 16px;">
+        <p style="font-size: 16px; color: var(--text-muted);">No quiz assessments available at the moment.</p>
+        <a href="ItemList.aspx" class="btn-primary" style="display: inline-block; margin-top: 16px; text-decoration: none;">Browse Recipes</a>
+      </asp:Panel>
     </div>
 
   </main>

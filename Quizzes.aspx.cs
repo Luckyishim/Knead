@@ -26,11 +26,20 @@ namespace KneadLMS
                                ORDER BY q.QuizID DESC";
 
                 DataTable dt = DbHelper.ExecuteQuery(sql);
-                rptQuizzes.DataSource = dt;
-                rptQuizzes.DataBind();
+                if (dt.Rows.Count > 0)
+                {
+                    rptQuizzes.DataSource = dt;
+                    rptQuizzes.DataBind();
+                    pnlNoQuizzes.Visible = false;
+                }
+                else
+                {
+                    pnlNoQuizzes.Visible = true;
+                }
             }
             catch
             {
+                pnlNoQuizzes.Visible = true;
             }
         }
     }

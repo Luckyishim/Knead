@@ -20,6 +20,7 @@ namespace KneadLMS
                 LoadUserInfo();
                 LoadUserMetrics();
                 LoadUserProgress();
+                LoadCuisineProgress();
             }
         }
 
@@ -100,6 +101,45 @@ namespace KneadLMS
             catch
             {
                 pnlNoProgress.Visible = true;
+            }
+        }
+
+        private void LoadCuisineProgress()
+        {
+            int userId = Convert.ToInt32(Session["UserID"]);
+
+            try
+            {
+                string sql = @"SELECT c.CuisineID, c.CuisineName,
+                                      COUNT(DISTINCT r.RecipeID) AS TotalRecipes,
+                                      COUNT(DISTINCT CASE WHEN up.IsCompleted = 1 THEN up.RecipeID END) AS CompletedRecipes,
+                                      CASE WHEN COUNT(DISTINCT r.RecipeID) > 0 
+                                           THEN (COUNT(DISTINCT CASE WHEN up.IsCompleted = 1 THEN up.RecipeID END) * 100) / COUNT(DISTINCT r.RecipeID)
+                                           ELSE 0 END AS ProgressPercent
+                               FROM Cuisine c
+                               INNER JOIN CourseType ct ON c.CuisineID = ct.CuisineID
+                               INNER JOIN Recipe r ON ct.CourseTypeID = r.CourseTypeID
+                               LEFT JOIN UserProgress up ON r.RecipeID = up.RecipeID AND up.UserID = @UserID
+                               GROUP BY c.CuisineID, c.CuisineName
+                               ORDER BY c.CuisineName";
+
+                SqlParameter[] p = { new SqlParameter("@UserID", userId) };
+                DataTable dt = DbHelper.ExecuteQuery(sql, p);
+
+                if (dt.Rows.Count > 0)
+                {
+                    rptCuisineProgress.DataSource = dt;
+                    rptCuisineProgress.DataBind();
+                    pnlNoCuisineProgress.Visible = false;
+                }
+                else
+                {
+                    pnlNoCuisineProgress.Visible = true;
+                }
+            }
+            catch
+            {
+                pnlNoCuisineProgress.Visible = true;
             }
         }
     }
