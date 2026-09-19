@@ -75,5 +75,11 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.TextBox txtStepNumber;
         protected global::System.Web.UI.WebControls.TextBox txtStepInstruction;
         protected global::System.Web.UI.WebControls.TextBox txtStepImage;
+        // Media manager controls
+        protected global::System.Web.UI.WebControls.DropDownList ddlMediaRecipe;
+        protected global::System.Web.UI.WebControls.TextBox txtMediaImageUrl;
+        protected global::System.Web.UI.WebControls.FileUpload fuMediaImage;
+        protected global::System.Web.UI.WebControls.TextBox txtMediaVideoUrl;
+        protected global::System.Web.UI.WebControls.Button btnSaveMedia;
     }
 }

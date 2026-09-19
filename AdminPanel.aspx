@@ -168,6 +168,38 @@
 
       <!-- RECIPES & STEPS PANEL -->
       <asp:Panel ID="pnlRecipes" runat="server" Visible="false">
+        <!-- Media Manager: Edit recipe thumbnail and video URL -->
+        <div class="admin-card">
+          <div class="section-header">
+            <h3>Media Manager</h3>
+            <p class="muted">Quickly update a recipe's image or tutorial video URL from the admin interface.</p>
+          </div>
+
+          <div class="form-grid" style="margin-top:12px; align-items: end;">
+            <div class="admin-form-group">
+              <label>Select Recipe</label>
+              <asp:DropDownList ID="ddlMediaRecipe" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddlMediaRecipe_SelectedIndexChanged"></asp:DropDownList>
+            </div>
+
+            <div class="admin-form-group">
+              <label>Current Image URL</label>
+              <asp:TextBox ID="txtMediaImageUrl" runat="server" CssClass="form-control" placeholder="https://... or relative path" ></asp:TextBox>
+            </div>
+
+            <div class="admin-form-group">
+              <label>Upload New Image (optional)</label>
+              <asp:FileUpload ID="fuMediaImage" runat="server" CssClass="form-control" />
+            </div>
+
+            <div class="admin-form-group">
+              <label>Video Tutorial URL (YouTube)</label>
+              <asp:TextBox ID="txtMediaVideoUrl" runat="server" CssClass="form-control" placeholder="https://www.youtube.com/watch?v=..." ></asp:TextBox>
+            </div>
+          </div>
+
+          <asp:Button ID="btnSaveMedia" runat="server" Text="Save Media" OnClick="btnSaveMedia_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+        </div>
+
         <div class="admin-card">
           <div class="section-header">
             <h3>Create New Recipe</h3>
