@@ -144,7 +144,7 @@
                     <p class="course-module"><%# Convert.ToBoolean(Eval("IsCompleted")) ? "Status: Completed ✓" : "Status: In Progress" %></p>
                     <div class="progress-bar-container">
                       <div class="progress-track">
-                        <div class="progress-fill" style='<%# Convert.ToBoolean(Eval("IsCompleted")) ? "width: 100%;" : "width: 50%;" %>'></div>
+                        <div class="progress-fill" style='<%# "width:" + (Convert.ToBoolean(Eval("IsCompleted")) ? "100" : "50") + "%" %>'></div>
                       </div>
                       <a href='<%# "RecipeDetail.aspx?recipeId=" + Eval("RecipeID") %>' class="btn-dark"><%# Convert.ToBoolean(Eval("IsCompleted")) ? "Review" : "Resume" %></a>
                     </div>
@@ -171,10 +171,10 @@
               <div class="cuisine-progress-item">
                 <div class="cuisine-progress-label">
                   <span><%# Eval("CuisineName") %></span>
-                  <span><%# Eval("ProgressPercent") %>%</span>
+                  <span><%# Eval("ProgressPercent") + "%" %></span>
                 </div>
                 <div class="cuisine-progress-track">
-                  <div class="cuisine-progress-fill" style='width: <%# Eval("ProgressPercent") %>%;'></div>
+                  <div class="cuisine-progress-fill" style='<%# "width: " + Eval("ProgressPercent") + "%" %>'></div>
                 </div>
               </div>
             </ItemTemplate>
