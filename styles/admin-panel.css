@@ -46,14 +46,99 @@
   color: var(--text-muted, #78716C);
 }
 
-/* Admin Message Alert */
+/* ==========================================================================
+   SIDEBAR ACTIVE & HOVER STATES (admin-specific overrides)
+   ========================================================================== */
+.menu-item {
+  border-left: 4px solid transparent;
+  padding-left: 12px;
+}
+
+.menu-item.active {
+  background-color: #FFF4E5 !important;
+  color: #FF8A00 !important;
+  font-weight: 700;
+  border-left: 4px solid #FF8A00;
+  box-shadow: none;
+  border-radius: 0 10px 10px 0;
+}
+
+.menu-item:hover:not(.active) {
+  background-color: rgba(255, 138, 0, 0.06);
+  color: var(--text-main);
+}
+
+.menu-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   ADMIN ALERT BANNER
+   ========================================================================== */
+.admin-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border-left: 5px solid #FF8A00;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05));
+  background-color: #FFF9F0;
+  color: #78350F;
+}
+
+.admin-alert.is-error {
+  border-left-color: #DC2626;
+  background-color: #FEF2F2;
+  color: #7F1D1D;
+}
+
+.admin-alert.is-success {
+  border-left-color: #059669;
+  background-color: #ECFDF5;
+  color: #064E3B;
+}
+
+.admin-alert-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.admin-alert-body {
+  flex: 1;
+}
+
+.admin-alert-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.admin-alert-close:hover {
+  opacity: 1;
+}
+
 #pnlAdminMsg {
   transition: all 0.3s ease;
   font-size: 14px;
   box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05));
 }
 
-/* Admin Form Controls & Cards */
+/* ==========================================================================
+   ADMIN FORM CARDS
+   ========================================================================== */
 .admin-card {
   background: #FFFFFF;
   padding: 28px;
@@ -76,7 +161,6 @@
   gap: 6px;
 }
 
-/* grid helper for forms */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -87,6 +171,7 @@
   font-size: 18px;
   margin: 0;
 }
+
 .section-header .muted {
   margin-top: 6px;
   color: var(--text-muted);
@@ -109,7 +194,9 @@ label {
   letter-spacing: 0.04em;
 }
 
-/* Styled Inputs, Dropdowns, and Textareas */
+/* ==========================================================================
+   FORM INPUTS
+   ========================================================================== */
 .form-control,
 input[type="text"],
 input[type="number"],
@@ -137,23 +224,25 @@ input[type="email"]:focus,
 input[type="password"]:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--primary-orange, #FF6B00);
+  border-color: #FF8A00;
   background-color: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
 }
 
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2078716C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2378716C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 36px;
   cursor: pointer;
 }
 
-/* Primary Button Hover Styling */
+/* ==========================================================================
+   PRIMARY BUTTON
+   ========================================================================== */
 .btn-primary {
-  background-color: var(--primary-orange, #FF6B00);
+  background-color: #FF8A00;
   color: #FFFFFF;
   font-weight: 700;
   font-size: 14px;
@@ -169,59 +258,199 @@ select.form-control {
 }
 
 .btn-primary:hover {
-  background-color: #E55C00;
+  background-color: #E07800;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(255, 138, 0, 0.28);
 }
 
 .btn-primary:active {
   transform: translateY(0);
 }
 
-/* User List Table Styling */
-.table,
-#gvUsers {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background-color: #FFFFFF;
-  border-radius: 12px;
+/* ==========================================================================
+   TABLE CARD WRAPPER (Responsive)
+   ========================================================================== */
+.table-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid var(--border-light, #EFE6DC);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   overflow: hidden;
+  margin-top: 16px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================================================
+   DATA TABLES
+   ========================================================================== */
+.table,
+#gvUsers,
+#gvAdminCuisines,
+#gvAdminRecipes,
+#gvAdminQuizzes {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #FFFFFF;
 }
 
 .table th,
-#gvUsers th {
+#gvUsers th,
+#gvAdminCuisines th,
+#gvAdminRecipes th,
+#gvAdminQuizzes th {
   background-color: #F5EFEB;
   color: #57534E;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   padding: 14px 16px;
   text-align: left;
-  border-bottom: 2px solid var(--border-light, #EFE6DC);
+  border-bottom: 2px solid #EFE6DC;
+  white-space: nowrap;
 }
 
 .table td,
-#gvUsers td {
+#gvUsers td,
+#gvAdminCuisines td,
+#gvAdminRecipes td,
+#gvAdminQuizzes td {
   padding: 14px 16px;
   font-size: 14px;
   color: var(--text-dark, #1C1917);
-  border-bottom: 1px solid var(--border-light, #EFE6DC);
+  border-bottom: 1px solid #F0E7DC;
   vertical-align: middle;
 }
 
+.table tr:nth-child(even) td,
+#gvAdminCuisines tr:nth-child(even) td,
+#gvAdminRecipes tr:nth-child(even) td,
+#gvAdminQuizzes tr:nth-child(even) td {
+  background-color: #FCF9F5;
+}
+
 .table tr:last-child td,
-#gvUsers tr:last-child td {
+#gvUsers tr:last-child td,
+#gvAdminCuisines tr:last-child td,
+#gvAdminRecipes tr:last-child td,
+#gvAdminQuizzes tr:last-child td {
   border-bottom: none;
 }
 
 .table tr:hover td,
-#gvUsers tr:hover td {
-  background-color: #FAF5EF;
+#gvUsers tr:hover td,
+#gvAdminCuisines tr:hover td,
+#gvAdminRecipes tr:hover td,
+#gvAdminQuizzes tr:hover td {
+  background-color: #FBF4EA;
 }
 
-/* User Role Badge in Table */
+.col-id,
+.table td:first-child,
+#gvAdminCuisines td:first-child,
+#gvAdminRecipes td:first-child,
+#gvAdminQuizzes td:first-child {
+  width: 60px;
+  color: var(--text-muted, #78716C);
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   ACTION BUTTONS (Edit / Delete / Save / Cancel)
+   ========================================================================== */
+.grid-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.grid-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  line-height: 1.4;
+}
+
+.grid-btn.edit {
+  color: #FF8A00;
+  border-color: #FF8A00;
+  background-color: #FFF4E5;
+}
+
+.grid-btn.edit:hover {
+  background-color: #FF8A00;
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px rgba(255, 138, 0, 0.28);
+}
+
+.grid-btn.delete {
+  color: #DC2626;
+  border-color: #FCA5A5;
+  background-color: #FEF2F2;
+}
+
+.grid-btn.delete:hover {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  border-color: #DC2626;
+  box-shadow: 0 3px 10px rgba(220, 38, 38, 0.22);
+}
+
+.grid-btn.save {
+  color: #059669;
+  border-color: #A7F3D0;
+  background-color: #ECFDF5;
+}
+
+.grid-btn.save:hover {
+  background-color: #059669;
+  color: #FFFFFF;
+  border-color: #059669;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.22);
+}
+
+.grid-btn.cancel {
+  color: #57534E;
+  border-color: #D6D3D1;
+  background-color: #F5F5F4;
+}
+
+.grid-btn.cancel:hover {
+  background-color: #57534E;
+  color: #FFFFFF;
+  border-color: #57534E;
+}
+
+.actions-col,
+.col-actions {
+  white-space: nowrap;
+  min-width: 160px;
+  text-align: right;
+}
+
+.actions-header {
+  text-align: right !important;
+}
+
+/* ==========================================================================
+   USER ROLE BADGE
+   ========================================================================== */
 .role-badge {
   display: inline-block;
   padding: 4px 10px;
@@ -239,13 +468,3 @@ select.form-control {
   background-color: #E0E7FF;
   color: #3730A3;
 }
-
-.grid-actions { display:flex; gap:14px; align-items:center; justify-content:flex-end; }
-.grid-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; text-decoration:none; border:1px solid transparent; cursor:pointer; background: transparent; }
-.grid-btn.edit { background: transparent; color: var(--primary-orange, #FF6B00); border-color: var(--primary-orange, #FF6B00); }
-.grid-btn.edit:hover { background: rgba(255,107,0,0.06); }
-.grid-btn.delete { background: transparent; color: #991B1B; border-color: #FCA5A5; }
-.grid-btn.delete:hover { background: #FCA5A5; color: #fff; border-color: #FCA5A5; }
-.grid-btn.save { background:#D1FAE5; color:#065F46; }
-.grid-btn.cancel { background:#E5E7EB; color:#374151; }
-.actions-col { white-space: nowrap; min-width:160px; }
