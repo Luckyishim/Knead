@@ -61,6 +61,8 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.TextBox txtNewCuisineName;
         protected global::System.Web.UI.WebControls.TextBox txtNewCuisineDesc;
         protected global::System.Web.UI.WebControls.TextBox txtNewCuisineImg;
+        protected global::System.Web.UI.WebControls.HiddenField hfEditCuisineId;
+        protected global::System.Web.UI.WebControls.Button btnAddCuisine;
 
         protected global::System.Web.UI.WebControls.TextBox txtCourseTypeName;
 

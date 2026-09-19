@@ -17,7 +17,6 @@ namespace KneadLMS
                 Response.Redirect("Login.aspx");
                 return;
             }
-
             LoadAdminInfo();
 
             if (!IsPostBack)
@@ -26,6 +25,38 @@ namespace KneadLMS
                 LoadUsersTable();
                 PopulateDropdowns();
             }
+        }
+
+        // Attempts to find the actual column name on a table from a list of candidates.
+        private string GetActualColumn(string tableName, string[] candidates)
+        {
+            try
+            {
+                DataTable cols = DbHelper.ExecuteQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @TableName",
+                    new[] { new SqlParameter("@TableName", tableName) });
+                var existing = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (DataRow r in cols.Rows)
+                {
+                    existing.Add(r["COLUMN_NAME"].ToString());
+                }
+                foreach (var c in candidates)
+                {
+                    if (existing.Contains(c)) return c;
+                }
+            }
+            catch
+            {
+                // ignore and return null
+            }
+            return null;
+        }
+
+        // Load data into admin GridViews for editing
+        private void LoadAdminTables()
+        {
+            LoadCuisinesTable();
+            LoadRecipesTable();
+            LoadQuizzesTable();
         }
 
         private void LoadAdminInfo()
@@ -61,7 +92,7 @@ namespace KneadLMS
             }
             catch (Exception ex)
             {
-                ShowAdminMsg("Error loading metrics: " + ex.Message, false);
+                ShowAdminMsg("Error loading metrics (LoadOverviewMetrics): " + ex.Message, false);
             }
         }
 
@@ -76,7 +107,7 @@ namespace KneadLMS
             }
             catch (Exception ex)
             {
-                ShowAdminMsg("Error loading users table: " + ex.Message, false);
+                ShowAdminMsg("Error loading users table (LoadUsersTable): " + ex.Message, false);
             }
         }
 
@@ -84,8 +115,18 @@ namespace KneadLMS
         {
             try
             {
-                DataTable dtC = DbHelper.ExecuteQuery(
-                    "SELECT CuisineID, CuisineName FROM Cuisine ORDER BY CuisineName");
+                // Resolve actual column name for Cuisine primary key (many schemas use Id or CuisineID)
+                string cuisineIdCol = GetActualColumn("Cuisine", new[] { "CuisineID", "CuisineId", "Cuisine_Id", "Id", "ID", "cuisineid" });
+                DataTable dtC;
+                if (!string.IsNullOrEmpty(cuisineIdCol))
+                {
+                    dtC = DbHelper.ExecuteQuery("SELECT " + cuisineIdCol + " AS CuisineID, CuisineName FROM Cuisine ORDER BY CuisineName");
+                }
+                else
+                {
+                    // Fallback: try to load at least names so UI remains usable
+                    dtC = DbHelper.ExecuteQuery("SELECT CuisineName FROM Cuisine ORDER BY CuisineName");
+                }
                 ddlCourseCuisine.DataSource     = dtC;
                 ddlCourseCuisine.DataTextField  = "CuisineName";
                 ddlCourseCuisine.DataValueField = "CuisineID";
@@ -125,7 +166,7 @@ namespace KneadLMS
             }
             catch (Exception ex)
             {
-                ShowAdminMsg("Error loading dropdowns: " + ex.Message, false);
+                ShowAdminMsg("Error loading dropdowns (PopulateDropdowns): " + ex.Message, false);
             }
         }
 
@@ -148,19 +189,338 @@ namespace KneadLMS
         protected void btnNavCuisines_Click(object sender, EventArgs e)
         {
             PopulateDropdowns();
+            LoadAdminTables();
             ShowTab("cuisines");
         }
 
         protected void btnNavRecipes_Click(object sender, EventArgs e)
         {
             PopulateDropdowns();
+            LoadAdminTables();
             ShowTab("recipes");
         }
 
         protected void btnNavQuizzes_Click(object sender, EventArgs e)
         {
             PopulateDropdowns();
+            LoadAdminTables();
             ShowTab("quizzes");
+        }
+
+        // --- Cuisines Grid Events ---
+        protected void gvAdminCuisines_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "EditCuisine")
+                {
+                    int id = Convert.ToInt32(e.CommandArgument);
+                    // Load cuisine into form for editing
+                    DataTable dt = DbHelper.ExecuteQuery("SELECT CuisineID, CuisineName, Description, ImageURL FROM Cuisine WHERE CuisineID = @ID",
+                        new[] { new SqlParameter("@ID", id) });
+                    if (dt.Rows.Count > 0)
+                    {
+                        var r = dt.Rows[0];
+                        hfEditCuisineId.Value = r["CuisineID"].ToString();
+                        txtNewCuisineName.Text = r["CuisineName"].ToString();
+                        txtNewCuisineDesc.Text = r["Description"] != DBNull.Value ? r["Description"].ToString() : string.Empty;
+                        txtNewCuisineImg.Text = r["ImageURL"] != DBNull.Value ? r["ImageURL"].ToString() : string.Empty;
+                        btnAddCuisine.Text = "Update Cuisine";
+                        ShowTab("cuisines");
+                    }
+                }
+                else if (e.CommandName == "DeleteCuisine")
+                {
+                    int id = Convert.ToInt32(e.CommandArgument);
+                    // Check for linked course types
+                    object linked = DbHelper.ExecuteScalar("SELECT COUNT(*) FROM CourseType WHERE CuisineID = @ID", new[] { new SqlParameter("@ID", id) });
+                    if (linked != null && Convert.ToInt32(linked) > 0)
+                    {
+                        ShowAdminMsg("Cannot delete cuisine: it has course types associated. Remove them first.", false);
+                        return;
+                    }
+                    DbHelper.ExecuteNonQuery("DELETE FROM Cuisine WHERE CuisineID = @ID", new[] { new SqlParameter("@ID", id) });
+                    LoadAdminTables();
+                    PopulateDropdowns();
+                    LoadOverviewMetrics();
+                    ShowAdminMsg("Cuisine deleted.", true);
+                    ShowTab("cuisines");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error processing action: " + ex.Message, false);
+            }
+        }
+
+        protected void gvAdminCuisines_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+        {
+            int cuisineId = Convert.ToInt32(gvAdminCuisines.DataKeys[e.RowIndex].Value);
+            try
+            {
+                DbHelper.ExecuteNonQuery("DELETE FROM Cuisine WHERE CuisineID=@ID",
+                    new[] { new SqlParameter("@ID", cuisineId) });
+                LoadAdminTables();
+                PopulateDropdowns();
+                LoadOverviewMetrics();
+                ShowAdminMsg("Cuisine deleted.", true);
+                ShowTab("cuisines");
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error deleting cuisine: " + ex.Message, false);
+            }
+        }
+
+        // --- Recipes Grid Events ---
+        protected void gvAdminRecipes_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
+        {
+            gvAdminRecipes.EditIndex = e.NewEditIndex;
+            LoadRecipesTable();
+            ShowTab("recipes");
+        }
+
+        protected void gvAdminRecipes_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
+        {
+            gvAdminRecipes.EditIndex = -1;
+            LoadRecipesTable();
+            ShowTab("recipes");
+        }
+
+        protected void gvAdminRecipes_RowUpdating(object sender, System.Web.UI.WebControls.GridViewUpdateEventArgs e)
+        {
+            int recipeId = Convert.ToInt32(gvAdminRecipes.DataKeys[e.RowIndex].Value);
+            var row = gvAdminRecipes.Rows[e.RowIndex];
+            var txtTitle = (System.Web.UI.WebControls.TextBox)row.FindControl("txtEditRecipeTitle");
+            var ddlCourse = (System.Web.UI.WebControls.DropDownList)row.FindControl("ddlEditRecipeCourseType");
+            var txtDuration = (System.Web.UI.WebControls.TextBox)row.FindControl("txtEditRecipeDuration");
+            var ddlDiff = (System.Web.UI.WebControls.DropDownList)row.FindControl("ddlEditRecipeDifficulty");
+
+            string title = txtTitle != null ? txtTitle.Text.Trim() : string.Empty;
+            int courseTypeId = 0;
+            if (ddlCourse != null)
+            {
+                int.TryParse(ddlCourse.SelectedValue, out courseTypeId);
+            }
+            int duration = 0;
+            if (txtDuration != null)
+            {
+                int.TryParse(txtDuration.Text.Trim(), out duration);
+            }
+            string diff = ddlDiff != null ? ddlDiff.SelectedValue : "Intermediate";
+
+            try
+            {
+                if (courseTypeId > 0)
+                {
+                    DbHelper.ExecuteNonQuery(@"UPDATE Recipe SET RecipeTitle=@Title, CourseTypeID=@CourseTypeID, Duration=@Duration, Difficulty=@Difficulty WHERE RecipeID=@ID",
+                        new[] {
+                            new SqlParameter("@Title", title),
+                            new SqlParameter("@CourseTypeID", courseTypeId),
+                            new SqlParameter("@Duration", duration),
+                            new SqlParameter("@Difficulty", diff),
+                            new SqlParameter("@ID", recipeId)
+                        });
+                }
+                else
+                {
+                    DbHelper.ExecuteNonQuery(@"UPDATE Recipe SET RecipeTitle=@Title, Duration=@Duration, Difficulty=@Difficulty WHERE RecipeID=@ID",
+                        new[] {
+                            new SqlParameter("@Title", title),
+                            new SqlParameter("@Duration", duration),
+                            new SqlParameter("@Difficulty", diff),
+                            new SqlParameter("@ID", recipeId)
+                        });
+                }
+                gvAdminRecipes.EditIndex = -1;
+                LoadRecipesTable();
+                PopulateDropdowns();
+                ShowAdminMsg("Recipe updated.", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error updating recipe: " + ex.Message, false);
+            }
+            ShowTab("recipes");
+        }
+
+        protected void gvAdminRecipes_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+        {
+            int recipeId = Convert.ToInt32(gvAdminRecipes.DataKeys[e.RowIndex].Value);
+            try
+            {
+                DbHelper.ExecuteNonQuery("DELETE FROM Recipe WHERE RecipeID=@ID",
+                    new[] { new SqlParameter("@ID", recipeId) });
+                LoadRecipesTable();
+                PopulateDropdowns();
+                LoadOverviewMetrics();
+                ShowAdminMsg("Recipe deleted.", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error deleting recipe: " + ex.Message, false);
+            }
+            ShowTab("recipes");
+        }
+
+        protected void gvAdminRecipes_RowDataBound(object sender, System.Web.UI.WebControls.GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == System.Web.UI.WebControls.DataControlRowType.DataRow && (e.Row.RowState & System.Web.UI.WebControls.DataControlRowState.Edit) > 0)
+            {
+                var ddlCourse = (System.Web.UI.WebControls.DropDownList)e.Row.FindControl("ddlEditRecipeCourseType");
+                if (ddlCourse != null)
+                {
+                    DataTable dtCT = DbHelper.ExecuteQuery(
+                        @"SELECT ct.CourseTypeID, ct.CourseTypeName + ' (' + c.CuisineName + ')' AS CourseTypeDisplay
+                          FROM CourseType ct
+                          INNER JOIN Cuisine c ON ct.CuisineID = c.CuisineID
+                          ORDER BY c.CuisineName, ct.CourseTypeName");
+                    ddlCourse.DataSource = dtCT;
+                    ddlCourse.DataTextField = "CourseTypeDisplay";
+                    ddlCourse.DataValueField = "CourseTypeID";
+                    ddlCourse.DataBind();
+
+                    DataRowView drv = e.Row.DataItem as DataRowView;
+                    if (drv != null && drv.Row.Table.Columns.Contains("CourseTypeID") && drv["CourseTypeID"] != DBNull.Value)
+                    {
+                        string currentCtId = drv["CourseTypeID"].ToString();
+                        var item = ddlCourse.Items.FindByValue(currentCtId);
+                        if (item != null) ddlCourse.SelectedValue = currentCtId;
+                    }
+                }
+
+                var ddlDiff = (System.Web.UI.WebControls.DropDownList)e.Row.FindControl("ddlEditRecipeDifficulty");
+                if (ddlDiff != null)
+                {
+                    DataRowView drv = e.Row.DataItem as DataRowView;
+                    if (drv != null && drv.Row.Table.Columns.Contains("Difficulty") && drv["Difficulty"] != DBNull.Value)
+                    {
+                        string currentDiff = drv["Difficulty"].ToString();
+                        var item = ddlDiff.Items.FindByValue(currentDiff);
+                        if (item != null)
+                        {
+                            ddlDiff.SelectedValue = currentDiff;
+                        }
+                        else
+                        {
+                            ddlDiff.Items.Add(new System.Web.UI.WebControls.ListItem(currentDiff, currentDiff));
+                            ddlDiff.SelectedValue = currentDiff;
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Quizzes Grid Events ---
+        protected void gvAdminQuizzes_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
+        {
+            gvAdminQuizzes.EditIndex = e.NewEditIndex;
+            LoadQuizzesTable();
+            ShowTab("quizzes");
+        }
+
+        protected void gvAdminQuizzes_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
+        {
+            gvAdminQuizzes.EditIndex = -1;
+            LoadQuizzesTable();
+            ShowTab("quizzes");
+        }
+
+        protected void gvAdminQuizzes_RowUpdating(object sender, System.Web.UI.WebControls.GridViewUpdateEventArgs e)
+        {
+            int quizId = Convert.ToInt32(gvAdminQuizzes.DataKeys[e.RowIndex].Value);
+            var row = gvAdminQuizzes.Rows[e.RowIndex];
+            var txtTitle = (System.Web.UI.WebControls.TextBox)row.FindControl("txtEditQuizTitle");
+            var ddlRecipe = (System.Web.UI.WebControls.DropDownList)row.FindControl("ddlEditQuizRecipe");
+            var txtPass = (System.Web.UI.WebControls.TextBox)row.FindControl("txtEditPassingScore");
+
+            string title = txtTitle != null ? txtTitle.Text.Trim() : string.Empty;
+            int recipeId = 0;
+            if (ddlRecipe != null)
+            {
+                int.TryParse(ddlRecipe.SelectedValue, out recipeId);
+            }
+            int passing = 70;
+            if (txtPass != null)
+            {
+                int.TryParse(txtPass.Text.Trim(), out passing);
+            }
+
+            try
+            {
+                if (recipeId > 0)
+                {
+                    DbHelper.ExecuteNonQuery("UPDATE Quiz SET QuizTitle=@Title, RecipeID=@RecipeID, PassingScore=@PS WHERE QuizID=@ID",
+                        new[] {
+                            new SqlParameter("@Title", title),
+                            new SqlParameter("@RecipeID", recipeId),
+                            new SqlParameter("@PS", passing),
+                            new SqlParameter("@ID", quizId)
+                        });
+                }
+                else
+                {
+                    DbHelper.ExecuteNonQuery("UPDATE Quiz SET QuizTitle=@Title, PassingScore=@PS WHERE QuizID=@ID",
+                        new[] {
+                            new SqlParameter("@Title", title),
+                            new SqlParameter("@PS", passing),
+                            new SqlParameter("@ID", quizId)
+                        });
+                }
+                gvAdminQuizzes.EditIndex = -1;
+                LoadQuizzesTable();
+                PopulateDropdowns();
+                ShowAdminMsg("Quiz updated.", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error updating quiz: " + ex.Message, false);
+            }
+            ShowTab("quizzes");
+        }
+
+        protected void gvAdminQuizzes_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+        {
+            int quizId = Convert.ToInt32(gvAdminQuizzes.DataKeys[e.RowIndex].Value);
+            try
+            {
+                DbHelper.ExecuteNonQuery("DELETE FROM Quiz WHERE QuizID=@ID",
+                    new[] { new SqlParameter("@ID", quizId) });
+                LoadQuizzesTable();
+                PopulateDropdowns();
+                LoadOverviewMetrics();
+                ShowAdminMsg("Quiz deleted.", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error deleting quiz: " + ex.Message, false);
+            }
+            ShowTab("quizzes");
+        }
+
+        protected void gvAdminQuizzes_RowDataBound(object sender, System.Web.UI.WebControls.GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == System.Web.UI.WebControls.DataControlRowType.DataRow && (e.Row.RowState & System.Web.UI.WebControls.DataControlRowState.Edit) > 0)
+            {
+                var ddlRecipe = (System.Web.UI.WebControls.DropDownList)e.Row.FindControl("ddlEditQuizRecipe");
+                if (ddlRecipe != null)
+                {
+                    DataTable dtR = DbHelper.ExecuteQuery(
+                        "SELECT RecipeID, RecipeTitle FROM Recipe ORDER BY RecipeTitle");
+                    ddlRecipe.DataSource = dtR;
+                    ddlRecipe.DataTextField = "RecipeTitle";
+                    ddlRecipe.DataValueField = "RecipeID";
+                    ddlRecipe.DataBind();
+
+                    DataRowView drv = e.Row.DataItem as DataRowView;
+                    if (drv != null && drv.Row.Table.Columns.Contains("RecipeID") && drv["RecipeID"] != DBNull.Value)
+                    {
+                        string currentRId = drv["RecipeID"].ToString();
+                        var item = ddlRecipe.Items.FindByValue(currentRId);
+                        if (item != null) ddlRecipe.SelectedValue = currentRId;
+                    }
+                }
+            }
         }
 
         protected void ddlMediaRecipe_SelectedIndexChanged(object sender, EventArgs e)
@@ -263,46 +623,58 @@ namespace KneadLMS
         {
             try
             {
-                DataTable dt = DbHelper.ExecuteQuery(
-                    @"SELECT c.CuisineID, c.CuisineName, c.Description, 
-                             (SELECT COUNT(*) FROM CourseType ct WHERE ct.CuisineID = c.CuisineID) AS CourseCount
-                      FROM Cuisine c ORDER BY c.CuisineID DESC");
-                gvAdminCuisines.DataSource = dt;
+                string cuisineIdCol = GetActualColumn("Cuisine", new[] { "CuisineID", "CuisineId", "Cuisine_Id", "Id", "ID", "cuisineid" });
+                string idCol = cuisineIdCol ?? "CuisineID";
+                string subcount = "(SELECT COUNT(*) FROM CourseType ct WHERE ct.CuisineID = c." + idCol + ")";
+                DataTable dtC = DbHelper.ExecuteQuery(
+                    "SELECT c." + idCol + " AS CuisineID, c.CuisineName, c.Description, " + subcount + " AS CourseCount " +
+                    "FROM Cuisine c ORDER BY c." + idCol + " DESC");
+                gvAdminCuisines.DataSource = dtC;
                 gvAdminCuisines.DataBind();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading Cuisines table (LoadCuisinesTable): " + ex.Message, false);
+            }
         }
 
         private void LoadRecipesTable()
         {
             try
             {
-                DataTable dt = DbHelper.ExecuteQuery(
-                    @"SELECT r.RecipeID, r.RecipeTitle, r.Duration, r.Difficulty, c.CuisineName, ct.CourseTypeName
+                DataTable dtR = DbHelper.ExecuteQuery(
+                    @"SELECT r.RecipeID, r.RecipeTitle, r.Duration, r.Difficulty, r.CourseTypeID,
+                             ct.CuisineID, c.CuisineName, ct.CourseTypeName
                       FROM Recipe r
-                      INNER JOIN CourseType ct ON r.CourseTypeID = ct.CourseTypeID
-                      INNER JOIN Cuisine c ON ct.CuisineID = c.CuisineID
+                      LEFT JOIN CourseType ct ON r.CourseTypeID = ct.CourseTypeID
+                      LEFT JOIN Cuisine c ON ct.CuisineID = c.CuisineID
                       ORDER BY r.RecipeID DESC");
-                gvAdminRecipes.DataSource = dt;
+                gvAdminRecipes.DataSource = dtR;
                 gvAdminRecipes.DataBind();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading Recipes table (LoadRecipesTable): " + ex.Message, false);
+            }
         }
 
         private void LoadQuizzesTable()
         {
             try
             {
-                DataTable dt = DbHelper.ExecuteQuery(
-                    @"SELECT q.QuizID, q.QuizTitle, q.PassingScore, r.RecipeTitle,
+                DataTable dtQ = DbHelper.ExecuteQuery(
+                    @"SELECT q.QuizID, q.QuizTitle, q.PassingScore, q.RecipeID, r.RecipeTitle,
                              (SELECT COUNT(*) FROM QuizQuestion qq WHERE qq.QuizID = q.QuizID) AS QuestionCount
                       FROM Quiz q
-                      INNER JOIN Recipe r ON q.RecipeID = r.RecipeID
+                      LEFT JOIN Recipe r ON q.RecipeID = r.RecipeID
                       ORDER BY q.QuizID DESC");
-                gvAdminQuizzes.DataSource = dt;
+                gvAdminQuizzes.DataSource = dtQ;
                 gvAdminQuizzes.DataBind();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading Quizzes table (LoadQuizzesTable): " + ex.Message, false);
+            }
         }
 
         protected void btnAddCuisine_Click(object sender, EventArgs e)
@@ -320,20 +692,44 @@ namespace KneadLMS
 
             try
             {
-                string sql = "INSERT INTO Cuisine (CuisineName, Description, ImageURL) VALUES (@Name, @Desc, @Img)";
-                SqlParameter[] p = {
-                    new SqlParameter("@Name", name),
-                    new SqlParameter("@Desc", string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
-                    new SqlParameter("@Img",  string.IsNullOrEmpty(img)  ? "images/momo_dish.jpg" : img)
-                };
+                // If hfEditCuisineId has a value, perform UPDATE instead of INSERT
+                if (!string.IsNullOrEmpty(hfEditCuisineId.Value))
+                {
+                    int editId = Convert.ToInt32(hfEditCuisineId.Value);
+                    string sql = "UPDATE Cuisine SET CuisineName=@Name, Description=@Desc, ImageURL=@Img WHERE CuisineID=@ID";
+                    SqlParameter[] p = {
+                        new SqlParameter("@Name", name),
+                        new SqlParameter("@Desc", string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                        new SqlParameter("@Img",  string.IsNullOrEmpty(img)  ? "images/momo_dish.jpg" : img),
+                        new SqlParameter("@ID", editId)
+                    };
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    // Reset edit state and inputs
+                    hfEditCuisineId.Value = "";
+                    btnAddCuisine.Text = "Add Cuisine";
+                    txtNewCuisineName.Text = "";
+                    txtNewCuisineDesc.Text = "";
+                    txtNewCuisineImg.Text  = "";
+                    ShowAdminMsg("Cuisine updated successfully.", true);
+                }
+                else
+                {
+                    string sql = "INSERT INTO Cuisine (CuisineName, Description, ImageURL) VALUES (@Name, @Desc, @Img)";
+                    SqlParameter[] p = {
+                        new SqlParameter("@Name", name),
+                        new SqlParameter("@Desc", string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                        new SqlParameter("@Img",  string.IsNullOrEmpty(img)  ? "images/momo_dish.jpg" : img)
+                    };
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    txtNewCuisineName.Text = "";
+                    txtNewCuisineDesc.Text = "";
+                    txtNewCuisineImg.Text  = "";
+                    ShowAdminMsg("Cuisine '" + name + "' added successfully!", true);
+                }
 
-                DbHelper.ExecuteNonQuery(sql, p);
-                txtNewCuisineName.Text = "";
-                txtNewCuisineDesc.Text = "";
-                txtNewCuisineImg.Text  = "";
+                // Refresh metrics and dropdowns after change
                 LoadOverviewMetrics();
                 PopulateDropdowns();
-                ShowAdminMsg("Cuisine '" + name + "' added successfully!", true);
             }
             catch (Exception ex)
             {

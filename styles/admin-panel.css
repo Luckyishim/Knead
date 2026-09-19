@@ -239,3 +239,13 @@ select.form-control {
   background-color: #E0E7FF;
   color: #3730A3;
 }
+
+.grid-actions { display:flex; gap:14px; align-items:center; justify-content:flex-end; }
+.grid-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; text-decoration:none; border:1px solid transparent; cursor:pointer; background: transparent; }
+.grid-btn.edit { background: transparent; color: var(--primary-orange, #FF6B00); border-color: var(--primary-orange, #FF6B00); }
+.grid-btn.edit:hover { background: rgba(255,107,0,0.06); }
+.grid-btn.delete { background: transparent; color: #991B1B; border-color: #FCA5A5; }
+.grid-btn.delete:hover { background: #FCA5A5; color: #fff; border-color: #FCA5A5; }
+.grid-btn.save { background:#D1FAE5; color:#065F46; }
+.grid-btn.cancel { background:#E5E7EB; color:#374151; }
+.actions-col { white-space: nowrap; min-width:160px; }

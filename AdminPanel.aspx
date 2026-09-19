@@ -20,34 +20,34 @@
       <nav class="sidebar-menu">
         <asp:LinkButton ID="btnNavOverview" runat="server" OnClick="btnNavOverview_Click" CssClass="menu-item active">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </svg>
           Overview & Metrics
         </asp:LinkButton>
 
         <asp:LinkButton ID="btnNavCuisines" runat="server" OnClick="btnNavCuisines_Click" CssClass="menu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </svg>
           Manage Cuisines & Courses
         </asp:LinkButton>
 
         <asp:LinkButton ID="btnNavRecipes" runat="server" OnClick="btnNavRecipes_Click" CssClass="menu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </svg>
           Manage Recipes & Steps
         </asp:LinkButton>
 
         <asp:LinkButton ID="btnNavQuizzes" runat="server" OnClick="btnNavQuizzes_Click" CssClass="menu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <circle cx="12" cy="12" r="10"></circle>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <polyline points="12 6 12 12 16 14"></polyline>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </svg>
           Manage Quizzes & Questions
         </asp:LinkButton>
       </nav>
@@ -129,6 +129,7 @@
             </div>
           </div>
 
+          <asp:HiddenField ID="hfEditCuisineId" runat="server" />
           <asp:Button ID="btnAddCuisine" runat="server" Text="Add Cuisine" OnClick="btnAddCuisine_Click" CssClass="btn-primary" Style="margin-top: 16px;" />
 
           <hr style="margin: 22px 0; border:none; border-top:1px solid var(--border-light);" />
@@ -153,12 +154,32 @@
           <div class="continue-learning-section" style="margin-top: 28px;">
             <h3>Existing Cuisines</h3>
             <div class="ingredients-box">
-              <asp:GridView ID="gvAdminCuisines" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+              <asp:GridView ID="gvAdminCuisines" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10" DataKeyNames="CuisineID"
+                OnRowCommand="gvAdminCuisines_RowCommand" OnRowDeleting="gvAdminCuisines_RowDeleting">
                 <Columns>
-                  <asp:BoundField DataField="CuisineID" HeaderText="ID" />
-                  <asp:BoundField DataField="CuisineName" HeaderText="CUISINE" />
-                  <asp:BoundField DataField="CourseCount" HeaderText="COURSES" />
-                  <asp:BoundField DataField="Description" HeaderText="DESCRIPTION" />
+                  <asp:BoundField DataField="CuisineID" HeaderText="ID" ReadOnly="True" />
+                  <asp:TemplateField HeaderText="CUISINE">
+                    <ItemTemplate><%# Eval("CuisineName") %></ItemTemplate>
+                    <EditItemTemplate>
+                      <asp:TextBox ID="txtEditCuisineName" runat="server" Text='<%# Bind("CuisineName") %>' CssClass="form-control" />
+                    </EditItemTemplate>
+                  </asp:TemplateField>
+                  <asp:BoundField DataField="CourseCount" HeaderText="COURSES" ReadOnly="True" />
+                  <asp:TemplateField HeaderText="DESCRIPTION">
+                    <ItemTemplate><%# Eval("Description") %></ItemTemplate>
+                    <EditItemTemplate>
+                      <asp:TextBox ID="txtEditCuisineDesc" runat="server" Text='<%# Bind("Description") %>' CssClass="form-control" />
+                    </EditItemTemplate>
+                  </asp:TemplateField>
+                  <asp:TemplateField HeaderText="ACTIONS" HeaderStyle-CssClass="actions-header">
+                    <ItemStyle CssClass="actions-col" />
+                    <ItemTemplate>
+                      <div class="grid-actions">
+                        <asp:LinkButton ID="lnkEdit" runat="server" CommandName="EditCuisine" CommandArgument='<%# Eval("CuisineID") %>' CssClass="grid-btn edit">Edit</asp:LinkButton>
+                        <asp:LinkButton ID="lnkDelete" runat="server" CommandName="DeleteCuisine" CommandArgument='<%# Eval("CuisineID") %>' OnClientClick="return confirm('Are you sure you want to delete this cuisine?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
+                      </div>
+                    </ItemTemplate>
+                  </asp:TemplateField>
                 </Columns>
               </asp:GridView>
             </div>
@@ -280,15 +301,60 @@
 
         <div class="continue-learning-section" style="margin-top: 28px;">
           <h3>Existing Recipes</h3>
-          <div class="ingredients-box">
-            <asp:GridView ID="gvAdminRecipes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+            <div class="ingredients-box">
+            <asp:GridView ID="gvAdminRecipes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10" DataKeyNames="RecipeID"
+              OnRowEditing="gvAdminRecipes_RowEditing" OnRowCancelingEdit="gvAdminRecipes_RowCancelingEdit" OnRowUpdating="gvAdminRecipes_RowUpdating" OnRowDeleting="gvAdminRecipes_RowDeleting"
+              OnRowDataBound="gvAdminRecipes_RowDataBound">
               <Columns>
-                <asp:BoundField DataField="RecipeID" HeaderText="ID" />
-                <asp:BoundField DataField="RecipeTitle" HeaderText="TITLE" />
-                <asp:BoundField DataField="CuisineName" HeaderText="CUISINE" />
-                <asp:BoundField DataField="CourseTypeName" HeaderText="COURSE" />
-                <asp:BoundField DataField="Duration" HeaderText="DURATION (MIN)" />
-                <asp:BoundField DataField="Difficulty" HeaderText="DIFFICULTY" />
+                <asp:BoundField DataField="RecipeID" HeaderText="ID" ReadOnly="True" />
+                <asp:TemplateField HeaderText="TITLE">
+                  <ItemTemplate><%# Eval("RecipeTitle") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:TextBox ID="txtEditRecipeTitle" runat="server" Text='<%# Bind("RecipeTitle") %>' CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="CUISINE">
+                  <ItemTemplate><%# Eval("CuisineName") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:Label ID="lblEditRecipeCuisine" runat="server" Text='<%# Eval("CuisineName") %>' CssClass="muted" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="COURSE">
+                  <ItemTemplate><%# Eval("CourseTypeName") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:DropDownList ID="ddlEditRecipeCourseType" runat="server" CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="DURATION (MIN)">
+                  <ItemTemplate><%# Eval("Duration") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:TextBox ID="txtEditRecipeDuration" runat="server" Text='<%# Bind("Duration") %>' CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="DIFFICULTY">
+                  <ItemTemplate><%# Eval("Difficulty") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:DropDownList ID="ddlEditRecipeDifficulty" runat="server" CssClass="form-control">
+                      <asp:ListItem>Beginner</asp:ListItem>
+                      <asp:ListItem>Intermediate</asp:ListItem>
+                      <asp:ListItem>Advanced</asp:ListItem>
+                    </asp:DropDownList>
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField>
+                  <ItemTemplate>
+                    <div class="grid-actions">
+                      <asp:LinkButton ID="lnkEditR" runat="server" CommandName="Edit" CssClass="grid-btn edit">Edit</asp:LinkButton>
+                      <asp:LinkButton ID="lnkDeleteR" runat="server" CommandName="Delete" OnClientClick="return confirm('Delete this recipe?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
+                    </div>
+                  </ItemTemplate>
+                  <EditItemTemplate>
+                    <div class="grid-actions">
+                      <asp:LinkButton ID="lnkUpdateR" runat="server" CommandName="Update" CssClass="grid-btn save">Save</asp:LinkButton>
+                      <asp:LinkButton ID="lnkCancelR" runat="server" CommandName="Cancel" CssClass="grid-btn cancel">Cancel</asp:LinkButton>
+                    </div>
+                  </EditItemTemplate>
+                </asp:TemplateField>
               </Columns>
             </asp:GridView>
           </div>
@@ -370,13 +436,44 @@
         <div class="continue-learning-section" style="margin-top: 28px;">
           <h3>Existing Quizzes</h3>
           <div class="ingredients-box">
-            <asp:GridView ID="gvAdminQuizzes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10">
+            <asp:GridView ID="gvAdminQuizzes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="10" DataKeyNames="QuizID"
+              OnRowEditing="gvAdminQuizzes_RowEditing" OnRowCancelingEdit="gvAdminQuizzes_RowCancelingEdit" OnRowUpdating="gvAdminQuizzes_RowUpdating" OnRowDeleting="gvAdminQuizzes_RowDeleting"
+              OnRowDataBound="gvAdminQuizzes_RowDataBound">
               <Columns>
-                <asp:BoundField DataField="QuizID" HeaderText="ID" />
-                <asp:BoundField DataField="QuizTitle" HeaderText="QUIZ TITLE" />
-                <asp:BoundField DataField="RecipeTitle" HeaderText="RECIPE" />
-                <asp:BoundField DataField="PassingScore" HeaderText="PASSING SCORE (%)" />
-                <asp:BoundField DataField="QuestionCount" HeaderText="QUESTIONS" />
+                <asp:BoundField DataField="QuizID" HeaderText="ID" ReadOnly="True" />
+                <asp:TemplateField HeaderText="QUIZ TITLE">
+                  <ItemTemplate><%# Eval("QuizTitle") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:TextBox ID="txtEditQuizTitle" runat="server" Text='<%# Bind("QuizTitle") %>' CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="RECIPE">
+                  <ItemTemplate><%# Eval("RecipeTitle") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:DropDownList ID="ddlEditQuizRecipe" runat="server" CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="PASSING SCORE (%)">
+                  <ItemTemplate><%# Eval("PassingScore") %></ItemTemplate>
+                  <EditItemTemplate>
+                    <asp:TextBox ID="txtEditPassingScore" runat="server" Text='<%# Bind("PassingScore") %>' CssClass="form-control" />
+                  </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="QuestionCount" HeaderText="QUESTIONS" ReadOnly="True" />
+                <asp:TemplateField>
+                  <ItemTemplate>
+                    <div class="grid-actions">
+                      <asp:LinkButton ID="lnkEditQ" runat="server" CommandName="Edit" CssClass="grid-btn edit">Edit</asp:LinkButton>
+                      <asp:LinkButton ID="lnkDeleteQ" runat="server" CommandName="Delete" OnClientClick="return confirm('Delete this quiz?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
+                    </div>
+                  </ItemTemplate>
+                  <EditItemTemplate>
+                    <div class="grid-actions">
+                      <asp:LinkButton ID="lnkUpdateQ" runat="server" CommandName="Update" CssClass="grid-btn save">Save</asp:LinkButton>
+                      <asp:LinkButton ID="lnkCancelQ" runat="server" CommandName="Cancel" CssClass="grid-btn cancel">Cancel</asp:LinkButton>
+                    </div>
+                  </EditItemTemplate>
+                </asp:TemplateField>
               </Columns>
             </asp:GridView>
           </div>

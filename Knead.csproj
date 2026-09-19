@@ -53,6 +53,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="db\migrations\20260919_add_cuisineid.sql" />
     <Content Include="styles\*.css" />
     <Content Include="script.js" />
     <Content Include="images\hero_cooking.jpg" />
