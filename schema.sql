@@ -228,3 +228,8 @@ INSERT INTO UserProgress (UserID, RecipeID, IsCompleted, CompletedDate) VALUES
 INSERT INTO FavoriteRecipe (UserID, RecipeID) VALUES
 (2, 1);
 GO
+
+SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME IN ('Cuisine', 'CourseType', 'Recipe', 'RecipeStep', 'Quiz', 'QuizQuestion')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
