@@ -61,8 +61,14 @@ namespace KneadLMS
                     imgThumbnail.ImageUrl = string.IsNullOrEmpty(thumb) ? "images/momo_dish.jpg" : thumb;
 
                     string videoUrl = row["VideoURL"] != null ? row["VideoURL"].ToString() : "";
-                    ViewState["VideoURL"] = string.IsNullOrEmpty(videoUrl) ? "#" : videoUrl;
-                    lnkPlayVideo.NavigateUrl = ViewState["VideoURL"].ToString();
+                    ViewState["VideoURL"] = string.IsNullOrEmpty(videoUrl) ? "" : videoUrl;
+                    // Store video URL on the client side as a data attribute so the iframe
+                    // is only created after the user clicks Play (lazy-load).
+                    try
+                    {
+                        pnlVideoPlayer.Attributes["data-video"] = ViewState["VideoURL"].ToString();
+                    }
+                    catch { }
                     lnkForumDiscussions.NavigateUrl = "Forums.aspx?recipeId=" + recipeId.ToString();
 
                     litVideoTitle.Text = Server.HtmlEncode(row["RecipeTitle"].ToString());

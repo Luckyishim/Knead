@@ -240,7 +240,7 @@
             <div class="admin-form-group">
               <label>Recipe Title</label>
               <asp:TextBox ID="txtRecipeTitle" runat="server" CssClass="form-control" placeholder="e.g. Spicy Pad Thai"></asp:TextBox>
-              <asp:Literal ID="litRecipeEditHint" runat="server" EnableViewState="false" Visible="false" CssClass="muted" />
+              <asp:Label ID="litRecipeEditHint" runat="server" EnableViewState="false" Visible="false" CssClass="muted" />
             </div>
 
             <div class="admin-form-group">

@@ -50,20 +50,85 @@
     </div>
 
     <!-- Hero Video Player Container -->
-    <div class="video-player-box">
-      <asp:Image ID="imgThumbnail" runat="server" ImageUrl="images/momo_dish.jpg" AlternateText="Tutorial Video Thumbnail" />
-      <div class="video-overlay-header">Masterclass Tutorial 🌶️</div>
-      <div class="video-overlay-title">
+    <div class="video-player-box" style="position: relative; min-height: 60vh;">
+      <asp:Image ID="imgThumbnail" runat="server" ImageUrl="images/momo_dish.jpg" AlternateText="Tutorial Video Thumbnail" Style="width:100%; height:100%; object-fit:cover; display:block;" />
+      <asp:Panel ID="pnlVideoPlayer" runat="server" CssClass="video-embed-full" Style="position:absolute; left:0; top:0; width:100%; height:100%; z-index:0; background:transparent;" />
+      <div class="video-overlay-header" style="position:relative; z-index:2;">Masterclass Tutorial 🌶️</div>
+      <div class="video-overlay-title" style="position:relative; z-index:2;">
         <asp:Literal ID="litVideoTitle" runat="server">Recipe Video Guide</asp:Literal><br/>
         <span style="font-size: 18px; font-weight: 600; text-transform: none; opacity: 0.9;">Authentic Culinary Technique</span>
       </div>
-      <asp:HyperLink ID="lnkPlayVideo" runat="server" Target="_blank" CssClass="play-button-center" ToolTip="Play Video Masterclass">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        </svg>
-      </asp:HyperLink>
-      <div class="video-duration-badge"><asp:Literal ID="litVideoDuration" runat="server">12:45</asp:Literal></div>
+
+      <!-- Centered play button -->
+      <div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; z-index:2; pointer-events:none;">
+        <button type="button" class="yt-play-btn" aria-label="Play video" style="pointer-events:auto; border:0; background:transparent;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="30" fill="rgba(255,255,255,0.92)" />
+            <polygon points="26,20 48,32 26,44" fill="#111" />
+          </svg>
+        </button>
+      </div>
+      <div class="video-duration-badge" style="position:relative; z-index:2;"><asp:Literal ID="litVideoDuration" runat="server">12:45</asp:Literal></div>
     </div>
+    <script type="text/javascript">
+      (function () {
+        // Attach click handler to create iframe lazily when play button clicked
+        function ensurePlayer(container, videoUrl) {
+          if (!container) return;
+          if (container.dataset.playerCreated) return;
+          var id = 'yt-' + Math.random().toString(36).substr(2, 9);
+          var videoId = null;
+          if (!videoUrl) videoUrl = '';
+          // normalize ~/ prefix
+          if (videoUrl.indexOf('~/') === 0) {
+            videoUrl = window.location.origin + '/' + videoUrl.replace(/^~\//, '');
+          }
+          // extract youtube id with regex for many URL forms
+          var ytMatch = videoUrl.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
+          if (ytMatch && ytMatch[1]) videoId = ytMatch[1];
+          // fallback: query param v
+          if (!videoId) {
+            try {
+              var u = new URL(videoUrl, window.location.href);
+              var q = new URLSearchParams(u.search);
+              if (q.get('v')) videoId = q.get('v');
+            } catch (e) { }
+          }
+          var embedHtml = '';
+            if (videoId) {
+            // include mute=1 to improve autoplay reliability across browsers
+            embedHtml = '<iframe id="' + id + '" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&mute=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+          } else if (videoUrl) {
+            embedHtml = '<a href="' + videoUrl + '">Play video</a>';
+          }
+          container.innerHTML = embedHtml;
+          container.dataset.playerCreated = '1';
+        }
+
+        document.addEventListener('click', function (ev) {
+          var t = ev.target;
+          // Allow button or its SVG children
+          while (t && t !== document) {
+            if (t.classList && t.classList.contains('yt-play-btn')) {
+              var poster = t.closest('.video-player-box');
+              if (!poster) return;
+              // hide the poster image (imgThumbnail) but keep overlays visible
+              var img = poster.querySelector('#imgThumbnail');
+              if (img) { img.style.display = 'none'; }
+              var container = poster.querySelector('.video-embed-full');
+              if (container) {
+                // read data-video from server-injected panel
+                var videoUrl = container.getAttribute('data-video') || container.dataset.video || '';
+                ensurePlayer(container, videoUrl);
+              }
+              ev.preventDefault();
+              return;
+            }
+            t = t.parentNode;
+          }
+        }, false);
+      })();
+    </script>
 
     <!-- Tab Navigation -->
     <div class="detail-tab-nav">

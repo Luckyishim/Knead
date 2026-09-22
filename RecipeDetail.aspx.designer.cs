@@ -23,6 +23,7 @@ namespace KneadLMS
 
         protected global::System.Web.UI.WebControls.Image imgThumbnail;
         protected global::System.Web.UI.WebControls.HyperLink lnkPlayVideo;
+        protected global::System.Web.UI.WebControls.Panel pnlVideoPlayer;
         protected global::System.Web.UI.WebControls.HyperLink lnkForumDiscussions;
 
         protected global::System.Web.UI.WebControls.Literal litVideoTitle;

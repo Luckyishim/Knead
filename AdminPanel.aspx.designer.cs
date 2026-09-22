@@ -69,7 +69,7 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.TextBox txtCourseTypeName;
 
         protected global::System.Web.UI.WebControls.TextBox txtRecipeTitle;
-        protected global::System.Web.UI.WebControls.Literal litRecipeEditHint;
+        protected global::System.Web.UI.WebControls.Label litRecipeEditHint;
         protected global::System.Web.UI.WebControls.TextBox txtRecipeDesc;
         protected global::System.Web.UI.WebControls.TextBox txtRecipeIngredients;
         protected global::System.Web.UI.WebControls.TextBox txtRecipeDuration;
