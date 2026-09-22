@@ -157,11 +157,13 @@ function initBookmarkToggle() {
 function initVideoPlayer() {
   const playBtn = document.querySelector(".play-button-center");
   if (playBtn) {
+    // If a global play button exists but has no href, prevent default navigation
+    // and silently ignore rather than showing a blocking alert.
     playBtn.addEventListener("click", (e) => {
       const href = playBtn.getAttribute("href");
       if (!href || href === "#" || href.trim() === "") {
         e.preventDefault();
-        alert("Video guide is not available yet for this recipe.");
+        // no-op: per-page scripts handle video playback where available
       }
     });
   }

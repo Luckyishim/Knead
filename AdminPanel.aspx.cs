@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Web.UI;
 using System.IO;
 using System.Web.UI.WebControls;
+// No-op placeholder to allow grouped apply_patch edits (kept until audited and removed)
 
 namespace KneadLMS
 {

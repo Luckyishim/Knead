@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="db\migrations\20260919_add_cuisineid.sql" />
+    <Content Include="db\scripts\20260919_recipe_identity_diagnostics_and_reseed.sql" />
     <Content Include="styles\*.css" />
     <Content Include="script.js" />
     <Content Include="images\hero_cooking.jpg" />
@@ -212,6 +213,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".git\hooks\" />
     <Folder Include="App_Code\" />
   </ItemGroup>
   <PropertyGroup>
