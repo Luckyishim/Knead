@@ -1078,21 +1078,53 @@ namespace KneadLMS
                         newThumb = "~/uploads/recipes/" + fileName;
                     }
 
-                    string sql = @"INSERT INTO Recipe (CourseTypeID, RecipeTitle, Description, Ingredients, Duration, Difficulty, Thumbnail, VideoURL, CreatedAt)
-                                   VALUES (@CourseTypeID, @RecipeTitle, @Description, @Ingredients, @Duration, @Difficulty, @Thumbnail, @VideoURL, GETDATE())";
+                    // Prevent accidental duplicate records: if a recipe with same title+course exists, update it instead
+                    object existsIdObj = null;
+                    try
+                    {
+                        existsIdObj = DbHelper.ExecuteScalar("SELECT RecipeID FROM Recipe WHERE RecipeTitle = @Title AND CourseTypeID = @CourseTypeID",
+                            new[] { new SqlParameter("@Title", title), new SqlParameter("@CourseTypeID", courseTypeId) });
+                    }
+                    catch { existsIdObj = null; }
 
-                    SqlParameter[] p = {
-                        new SqlParameter("@CourseTypeID", courseTypeId),
-                        new SqlParameter("@RecipeTitle",  title),
-                        new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
-                        new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
-                        new SqlParameter("@Duration",     duration),
-                        new SqlParameter("@Difficulty",   difficulty),
-                        new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(newThumb) ? "images/momo_dish.jpg" : newThumb),
-                        new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video)
-                    };
+                    int existingId;
+                    if (existsIdObj != null && int.TryParse(existsIdObj.ToString(), out existingId))
+                    {
+                        // perform update instead of insert to avoid duplicates
+                        string updateSql = @"UPDATE Recipe SET CourseTypeID=@CourseTypeID, RecipeTitle=@RecipeTitle, Description=@Description, Ingredients=@Ingredients, Duration=@Duration, Difficulty=@Difficulty, Thumbnail=@Thumbnail, VideoURL=@VideoURL WHERE RecipeID=@RecipeID";
+                        SqlParameter[] up = {
+                            new SqlParameter("@CourseTypeID", courseTypeId),
+                            new SqlParameter("@RecipeTitle",  title),
+                            new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                            new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
+                            new SqlParameter("@Duration",     duration),
+                            new SqlParameter("@Difficulty",   difficulty),
+                            new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(newThumb) ? "images/momo_dish.jpg" : newThumb),
+                            new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video),
+                            new SqlParameter("@RecipeID",     existingId)
+                        };
+                        DbHelper.ExecuteNonQuery(updateSql, up);
+                        ShowAdminMsg("Existing recipe updated instead of creating duplicate (RecipeID=" + existingId + ").", true);
+                    }
+                    else
+                    {
+                        string sql = @"INSERT INTO Recipe (CourseTypeID, RecipeTitle, Description, Ingredients, Duration, Difficulty, Thumbnail, VideoURL, CreatedAt)
+                                       VALUES (@CourseTypeID, @RecipeTitle, @Description, @Ingredients, @Duration, @Difficulty, @Thumbnail, @VideoURL, GETDATE())";
 
-                    DbHelper.ExecuteNonQuery(sql, p);
+                        SqlParameter[] p = {
+                            new SqlParameter("@CourseTypeID", courseTypeId),
+                            new SqlParameter("@RecipeTitle",  title),
+                            new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                            new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
+                            new SqlParameter("@Duration",     duration),
+                            new SqlParameter("@Difficulty",   difficulty),
+                            new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(newThumb) ? "images/momo_dish.jpg" : newThumb),
+                            new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video)
+                        };
+
+                        DbHelper.ExecuteNonQuery(sql, p);
+                        ShowAdminMsg("Recipe '" + title + "' added successfully!", true);
+                    }
                     // no-op patch: context update only
                     txtRecipeTitle.Text       = "";
                     txtRecipeDesc.Text        = "";

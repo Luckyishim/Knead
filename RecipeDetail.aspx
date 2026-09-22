@@ -95,9 +95,9 @@
             } catch (e) { }
           }
           var embedHtml = '';
-            if (videoId) {
-            // include mute=1 to improve autoplay reliability across browsers
-            embedHtml = '<iframe id="' + id + '" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&mute=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+          if (videoId) {
+            // request autoplay (unmuted). Note: some browsers may block autoplay with sound.
+            embedHtml = '<iframe id="' + id + '" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
           } else if (videoUrl) {
             embedHtml = '<a href="' + videoUrl + '">Play video</a>';
           }
@@ -120,6 +120,11 @@
                 // read data-video from server-injected panel
                 var videoUrl = container.getAttribute('data-video') || container.dataset.video || '';
                 ensurePlayer(container, videoUrl);
+                // hide the play button overlay after creating the player
+                try {
+                  var playBtn = poster.querySelector('.yt-play-btn');
+                  if (playBtn) playBtn.style.display = 'none';
+                } catch (e) {}
               }
               ev.preventDefault();
               return;
