@@ -240,6 +240,7 @@
             <div class="admin-form-group">
               <label>Recipe Title</label>
               <asp:TextBox ID="txtRecipeTitle" runat="server" CssClass="form-control" placeholder="e.g. Spicy Pad Thai"></asp:TextBox>
+              <asp:Literal ID="litRecipeEditHint" runat="server" EnableViewState="false" Visible="false" CssClass="muted" />
             </div>
 
             <div class="admin-form-group">
@@ -342,7 +343,7 @@
           <div class="table-card">
             <div class="table-responsive">
               <asp:GridView ID="gvAdminRecipes" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="0" DataKeyNames="RecipeID"
-                OnRowEditing="gvAdminRecipes_RowEditing" OnRowCancelingEdit="gvAdminRecipes_RowCancelingEdit" OnRowUpdating="gvAdminRecipes_RowUpdating" OnRowDeleting="gvAdminRecipes_RowDeleting"
+                OnRowCommand="gvAdminRecipes_RowCommand" OnRowEditing="gvAdminRecipes_RowEditing" OnRowCancelingEdit="gvAdminRecipes_RowCancelingEdit" OnRowUpdating="gvAdminRecipes_RowUpdating" OnRowDeleting="gvAdminRecipes_RowDeleting"
                 OnRowDataBound="gvAdminRecipes_RowDataBound">
                 <Columns>
                   <asp:BoundField DataField="RecipeID" HeaderText="ID" ReadOnly="True" />
@@ -384,7 +385,7 @@
                     <ItemStyle CssClass="actions-col" />
                     <ItemTemplate>
                       <div class="grid-actions">
-                      <asp:LinkButton ID="lnkEditR" runat="server" CommandName="EditRecipe" CommandArgument='<%# Eval("RecipeID") %>' CssClass="grid-btn edit">Edit</asp:LinkButton>
+                        <asp:HyperLink ID="lnkEditR" runat="server" NavigateUrl='<%# "AdminPanel.aspx?editRecipe=" + Eval("RecipeID") %>' CssClass="grid-btn edit">Edit</asp:HyperLink>
                         <asp:LinkButton ID="lnkDeleteR" runat="server" CommandName="Delete" OnClientClick="return confirm('Delete this recipe?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
                       </div>
                     </ItemTemplate>

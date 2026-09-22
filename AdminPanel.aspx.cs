@@ -25,6 +25,53 @@ namespace KneadLMS
                 LoadOverviewMetrics();
                 LoadUsersTable();
                 PopulateDropdowns();
+                // If page requested with editRecipe query, load into top form
+                if (!string.IsNullOrEmpty(Request.QueryString["editRecipe"]))
+                {
+                    int rid;
+                    if (int.TryParse(Request.QueryString["editRecipe"], out rid))
+                    {
+                        LoadRecipeIntoForm(rid);
+                        ShowTab("recipes");
+                    }
+                }
+            }
+        }
+
+        private void LoadRecipeIntoForm(int recipeId)
+        {
+            try
+            {
+                DataTable dt = DbHelper.ExecuteQuery(@"SELECT r.RecipeID, r.RecipeTitle, r.Description, r.Ingredients, r.Duration, r.Difficulty, r.Thumbnail, r.VideoURL, r.CourseTypeID
+                                                         FROM Recipe r
+                                                         WHERE r.RecipeID = @RecipeID", new[] { new SqlParameter("@RecipeID", recipeId) });
+                if (dt.Rows.Count > 0)
+                {
+                    var r = dt.Rows[0];
+                    hfEditRecipeId.Value = r["RecipeID"].ToString();
+                    txtRecipeTitle.Text = r["RecipeTitle"].ToString();
+                    txtRecipeDesc.Text = r["Description"] != DBNull.Value ? r["Description"].ToString() : string.Empty;
+                    txtRecipeIngredients.Text = r["Ingredients"] != DBNull.Value ? r["Ingredients"].ToString() : string.Empty;
+                    txtRecipeDuration.Text = r["Duration"] != DBNull.Value ? r["Duration"].ToString() : string.Empty;
+                    txtRecipeThumb.Text = r["Thumbnail"] != DBNull.Value ? r["Thumbnail"].ToString() : string.Empty;
+                    txtRecipeVideo.Text = r["VideoURL"] != DBNull.Value ? r["VideoURL"].ToString() : string.Empty;
+                    // ensure dropdowns populated and set selections
+                    PopulateDropdowns();
+                    if (r["CourseTypeID"] != DBNull.Value)
+                    {
+                        try { ddlRecipeCourseType.SelectedValue = r["CourseTypeID"].ToString(); } catch { }
+                    }
+                    if (r["Difficulty"] != DBNull.Value)
+                    {
+                        try { ddlRecipeDifficulty.SelectedValue = r["Difficulty"].ToString(); } catch { }
+                    }
+                    btnAddRecipe.Text = "Update Recipe";
+                    BindRecipeSteps(recipeId);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading recipe: " + ex.Message, false);
             }
         }
 
@@ -396,6 +443,7 @@ namespace KneadLMS
                             try { ddlRecipeDifficulty.SelectedValue = r["Difficulty"].ToString(); } catch { }
                         }
                         btnAddRecipe.Text = "Update Recipe";
+                        try { litRecipeEditHint.Text = "Editing recipe ID: " + hfEditRecipeId.Value; litRecipeEditHint.Visible = true; } catch { }
                         // Load steps for this recipe in the steps grid
                         BindRecipeSteps(recipeId);
                         ShowTab("recipes");
@@ -943,6 +991,15 @@ namespace KneadLMS
                 if (!string.IsNullOrEmpty(hfEditRecipeId.Value))
                 {
                     int editId = Convert.ToInt32(hfEditRecipeId.Value);
+                    // Read existing thumbnail for safe cleanup after replace
+                    string oldThumb = null;
+                    try
+                    {
+                        object cur = DbHelper.ExecuteScalar("SELECT Thumbnail FROM Recipe WHERE RecipeID = @RecipeID", new[] { new SqlParameter("@RecipeID", editId) });
+                        if (cur != null && cur != DBNull.Value) oldThumb = cur.ToString();
+                    }
+                    catch { }
+
                     // Handle uploaded file if provided
                     string newThumb = thumb;
                     if (fuRecipeThumb.HasFile)
@@ -983,6 +1040,17 @@ namespace KneadLMS
                     hfEditRecipeId.Value = "";
                     btnAddRecipe.Text = "Save Recipe";
                     ShowAdminMsg("Recipe updated successfully.", true);
+
+                    // Delete old thumbnail file if it was in uploads and different from new
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(oldThumb) && !string.Equals(oldThumb, newThumb, StringComparison.OrdinalIgnoreCase) && oldThumb.IndexOf("uploads/recipes", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            string oldPath = oldThumb.StartsWith("~") ? Server.MapPath(oldThumb) : Server.MapPath("~/" + oldThumb.TrimStart('/'));
+                            if (File.Exists(oldPath)) File.Delete(oldPath);
+                        }
+                    }
+                    catch { /* ignore deletion errors */ }
                 }
                 else
                 {
@@ -1025,6 +1093,7 @@ namespace KneadLMS
                     };
 
                     DbHelper.ExecuteNonQuery(sql, p);
+                    // no-op patch: context update only
                     txtRecipeTitle.Text       = "";
                     txtRecipeDesc.Text        = "";
                     txtRecipeIngredients.Text = "";
