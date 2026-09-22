@@ -262,6 +262,11 @@
             </div>
 
             <div class="admin-form-group">
+              <label>Upload Thumbnail (optional)</label>
+              <asp:FileUpload ID="fuRecipeThumb" runat="server" CssClass="form-control" />
+            </div>
+
+            <div class="admin-form-group">
               <label>Video URL</label>
               <asp:TextBox ID="txtRecipeVideo" runat="server" CssClass="form-control" placeholder="https://youtube.com/..." ></asp:TextBox>
             </div>
@@ -277,6 +282,7 @@
             </div>
           </div>
 
+          <asp:HiddenField ID="hfEditRecipeId" runat="server" />
           <asp:Button ID="btnAddRecipe" runat="server" Text="Save Recipe" OnClick="btnAddRecipe_Click" CssClass="btn-primary" Style="margin-top: 16px;" />
         </div>
 
@@ -289,7 +295,7 @@
           <div class="form-grid" style="margin-top:12px;">
             <div class="admin-form-group">
               <label>Select Recipe</label>
-              <asp:DropDownList ID="ddlStepRecipe" runat="server" CssClass="form-control"></asp:DropDownList>
+              <asp:DropDownList ID="ddlStepRecipe" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlStepRecipe_SelectedIndexChanged" CssClass="form-control"></asp:DropDownList>
             </div>
             <div class="admin-form-group">
               <label>Step Number</label>
@@ -301,6 +307,34 @@
             </div>
           </div>
           <asp:Button ID="btnAddStep" runat="server" Text="Add Step" OnClick="btnAddStep_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+        </div>
+
+        <asp:HiddenField ID="hfEditStepId" runat="server" />
+
+        <div class="continue-learning-section" style="margin-top: 18px;">
+          <h4>Recipe Steps</h4>
+          <div class="table-card">
+            <div class="table-responsive">
+              <asp:GridView ID="gvRecipeSteps" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="0" DataKeyNames="StepID"
+                OnRowCommand="gvRecipeSteps_RowCommand" OnRowDeleting="gvRecipeSteps_RowDeleting">
+                <Columns>
+                  <asp:BoundField DataField="StepNumber" HeaderText="#" />
+                  <asp:BoundField DataField="Instruction" HeaderText="Instruction" />
+                  <asp:TemplateField HeaderText="Actions" HeaderStyle-CssClass="actions-header">
+                    <ItemStyle CssClass="actions-col" />
+                    <ItemTemplate>
+                      <div class="grid-actions">
+                        <asp:LinkButton ID="lnkEditStep" runat="server" CommandName="EditStep" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn edit">Edit</asp:LinkButton>
+                        <asp:LinkButton ID="lnkUp" runat="server" CommandName="MoveUp" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn">Up</asp:LinkButton>
+                        <asp:LinkButton ID="lnkDown" runat="server" CommandName="MoveDown" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn">Down</asp:LinkButton>
+                        <asp:LinkButton ID="lnkDeleteStep" runat="server" CommandName="DeleteStep" CommandArgument='<%# Eval("StepID") %>' OnClientClick="return confirm('Delete this step?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
+                      </div>
+                    </ItemTemplate>
+                  </asp:TemplateField>
+                </Columns>
+              </asp:GridView>
+            </div>
+          </div>
         </div>
 
         <div class="continue-learning-section" style="margin-top: 28px;">
@@ -350,7 +384,7 @@
                     <ItemStyle CssClass="actions-col" />
                     <ItemTemplate>
                       <div class="grid-actions">
-                        <asp:LinkButton ID="lnkEditR" runat="server" CommandName="Edit" CssClass="grid-btn edit">Edit</asp:LinkButton>
+                      <asp:LinkButton ID="lnkEditR" runat="server" CommandName="EditRecipe" CommandArgument='<%# Eval("RecipeID") %>' CssClass="grid-btn edit">Edit</asp:LinkButton>
                         <asp:LinkButton ID="lnkDeleteR" runat="server" CommandName="Delete" OnClientClick="return confirm('Delete this recipe?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
                       </div>
                     </ItemTemplate>

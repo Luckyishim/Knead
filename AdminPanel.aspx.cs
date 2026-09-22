@@ -17,6 +17,7 @@ namespace KneadLMS
                 Response.Redirect("Login.aspx");
                 return;
             }
+
             LoadAdminInfo();
 
             if (!IsPostBack)
@@ -24,6 +25,87 @@ namespace KneadLMS
                 LoadOverviewMetrics();
                 LoadUsersTable();
                 PopulateDropdowns();
+            }
+        }
+
+        protected void ddlStepRecipe_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(ddlStepRecipe.SelectedValue)) return;
+            int recipeId = Convert.ToInt32(ddlStepRecipe.SelectedValue);
+            BindRecipeSteps(recipeId);
+            ShowTab("recipes");
+        }
+
+        private void BindRecipeSteps(int recipeId)
+        {
+            try
+            {
+                DataTable dt = DbHelper.ExecuteQuery("SELECT StepID, StepNumber, Instruction FROM RecipeStep WHERE RecipeID=@RecipeID ORDER BY StepNumber", new[] { new SqlParameter("@RecipeID", recipeId) });
+                gvRecipeSteps.DataSource = dt;
+                gvRecipeSteps.DataBind();
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading recipe steps: " + ex.Message, false);
+            }
+        }
+
+        protected void gvRecipeSteps_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        {
+            if (string.Equals(e.CommandName, "EditStep", StringComparison.OrdinalIgnoreCase))
+            {
+                int stepId = Convert.ToInt32(e.CommandArgument);
+                DataTable dt = DbHelper.ExecuteQuery("SELECT StepID, RecipeID, StepNumber, Instruction FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                if (dt.Rows.Count > 0)
+                {
+                    var r = dt.Rows[0];
+                    hfEditStepId.Value = r["StepID"].ToString();
+                    ddlStepRecipe.SelectedValue = r["RecipeID"].ToString();
+                    txtStepNumber.Text = r["StepNumber"].ToString();
+                    txtStepInstruction.Text = r["Instruction"].ToString();
+                    // btnAddStep is declared in markup; ensure designer contains it. If not, fall back to client text change
+                    try { btnAddStep.Text = "Update Step"; } catch { }
+                    ShowTab("recipes");
+                }
+                return;
+            }
+
+            if (string.Equals(e.CommandName, "MoveUp", StringComparison.OrdinalIgnoreCase) || string.Equals(e.CommandName, "MoveDown", StringComparison.OrdinalIgnoreCase))
+            {
+                int stepId = Convert.ToInt32(e.CommandArgument);
+                // Load current step to get RecipeID and StepNumber
+                DataTable dt = DbHelper.ExecuteQuery("SELECT RecipeID, StepNumber FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                if (dt.Rows.Count == 0) return;
+                int recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
+                int stepNum = Convert.ToInt32(dt.Rows[0]["StepNumber"]);
+                if (e.CommandName == "MoveUp") stepNum--; else stepNum++;
+                // Find step that currently occupies target slot and swap numbers
+                DataTable other = DbHelper.ExecuteQuery("SELECT TOP 1 StepID, StepNumber FROM RecipeStep WHERE RecipeID=@RecipeID AND StepNumber=@StepNumber", new[] { new SqlParameter("@RecipeID", recipeId), new SqlParameter("@StepNumber", stepNum) });
+                DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = -1 WHERE StepID = @StepID", new[] { new SqlParameter("@StepID", stepId) });
+                if (other.Rows.Count > 0)
+                {
+                    int otherId = Convert.ToInt32(other.Rows[0]["StepID"]);
+                    DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", Convert.ToInt32(other.Rows[0]["StepNumber"] == DBNull.Value ? stepNum : other.Rows[0]["StepNumber"])), new SqlParameter("@StepID", otherId) });
+                }
+                DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", stepNum), new SqlParameter("@StepID", stepId) });
+                BindRecipeSteps(recipeId);
+                return;
+            }
+        }
+
+        protected void gvRecipeSteps_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+        {
+            int stepId = Convert.ToInt32(gvRecipeSteps.DataKeys[e.RowIndex].Value);
+            try
+            {
+                DbHelper.ExecuteNonQuery("DELETE FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                // reload steps for currently selected recipe
+                if (!string.IsNullOrEmpty(ddlStepRecipe.SelectedValue)) BindRecipeSteps(Convert.ToInt32(ddlStepRecipe.SelectedValue));
+                ShowAdminMsg("Step deleted.", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error deleting step: " + ex.Message, false);
             }
         }
 
@@ -275,9 +357,55 @@ namespace KneadLMS
         // --- Recipes Grid Events ---
         protected void gvAdminRecipes_RowEditing(object sender, System.Web.UI.WebControls.GridViewEditEventArgs e)
         {
+            // Keep legacy in-grid editing but don't require it for top-form edits
             gvAdminRecipes.EditIndex = e.NewEditIndex;
             LoadRecipesTable();
             ShowTab("recipes");
+        }
+
+        protected void gvAdminRecipes_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        {
+            try
+            {
+                if (string.Equals(e.CommandName, "EditRecipe", StringComparison.OrdinalIgnoreCase))
+                {
+                    int recipeId = Convert.ToInt32(e.CommandArgument);
+                    DataTable dt = DbHelper.ExecuteQuery(@"SELECT r.RecipeID, r.RecipeTitle, r.Description, r.Ingredients, r.Duration, r.Difficulty, r.Thumbnail, r.VideoURL, r.CourseTypeID, ct.CuisineID
+                                                         FROM Recipe r
+                                                         LEFT JOIN CourseType ct ON r.CourseTypeID = ct.CourseTypeID
+                                                         WHERE r.RecipeID = @RecipeID", new[] { new SqlParameter("@RecipeID", recipeId) });
+                    if (dt.Rows.Count > 0)
+                    {
+                        var r = dt.Rows[0];
+                        hfEditRecipeId.Value = r["RecipeID"].ToString();
+                        txtRecipeTitle.Text = r["RecipeTitle"].ToString();
+                        txtRecipeDesc.Text = r["Description"] != DBNull.Value ? r["Description"].ToString() : string.Empty;
+                        txtRecipeIngredients.Text = r["Ingredients"] != DBNull.Value ? r["Ingredients"].ToString() : string.Empty;
+                        txtRecipeDuration.Text = r["Duration"] != DBNull.Value ? r["Duration"].ToString() : string.Empty;
+                        txtRecipeThumb.Text = r["Thumbnail"] != DBNull.Value ? r["Thumbnail"].ToString() : string.Empty;
+                        txtRecipeVideo.Text = r["VideoURL"] != DBNull.Value ? r["VideoURL"].ToString() : string.Empty;
+                        // Try to set CourseType and difficulty dropdowns
+                        if (r["CourseTypeID"] != DBNull.Value)
+                        {
+                            string ctId = r["CourseTypeID"].ToString();
+                            PopulateDropdowns(); // ensure ddlRecipeCourseType is loaded
+                            try { ddlRecipeCourseType.SelectedValue = ctId; } catch { }
+                        }
+                        if (r["Difficulty"] != DBNull.Value)
+                        {
+                            try { ddlRecipeDifficulty.SelectedValue = r["Difficulty"].ToString(); } catch { }
+                        }
+                        btnAddRecipe.Text = "Update Recipe";
+                        // Load steps for this recipe in the steps grid
+                        BindRecipeSteps(recipeId);
+                        ShowTab("recipes");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error loading recipe for edit: " + ex.Message, false);
+            }
         }
 
         protected void gvAdminRecipes_RowCancelingEdit(object sender, System.Web.UI.WebControls.GridViewCancelEditEventArgs e)
@@ -651,6 +779,12 @@ namespace KneadLMS
                       ORDER BY r.RecipeID DESC");
                 gvAdminRecipes.DataSource = dtR;
                 gvAdminRecipes.DataBind();
+                // Also refresh steps grid if a recipe is selected in ddlStepRecipe
+                if (!string.IsNullOrEmpty(ddlStepRecipe.SelectedValue))
+                {
+                    int sel = Convert.ToInt32(ddlStepRecipe.SelectedValue);
+                    BindRecipeSteps(sel);
+                }
             }
             catch (Exception ex)
             {
@@ -805,34 +939,106 @@ namespace KneadLMS
 
             try
             {
-                string sql = @"INSERT INTO Recipe (CourseTypeID, RecipeTitle, Description, Ingredients, Duration, Difficulty, Thumbnail, VideoURL, CreatedAt)
-                               VALUES (@CourseTypeID, @RecipeTitle, @Description, @Ingredients, @Duration, @Difficulty, @Thumbnail, @VideoURL, GETDATE())";
+                // If editing existing recipe
+                if (!string.IsNullOrEmpty(hfEditRecipeId.Value))
+                {
+                    int editId = Convert.ToInt32(hfEditRecipeId.Value);
+                    // Handle uploaded file if provided
+                    string newThumb = thumb;
+                    if (fuRecipeThumb.HasFile)
+                    {
+                        string[] allowed = new[] { ".png", ".jpg", ".jpeg", ".webp", ".gif" };
+                        string ext = Path.GetExtension(fuRecipeThumb.FileName).ToLowerInvariant();
+                        if (Array.IndexOf(allowed, ext) < 0)
+                        {
+                            ShowAdminMsg("Invalid image type. Allowed: jpg, png, webp, gif.", false);
+                            return;
+                        }
+                        if (fuRecipeThumb.PostedFile.ContentLength > 5 * 1024 * 1024)
+                        {
+                            ShowAdminMsg("Image too large (max 5MB).", false);
+                            return;
+                        }
+                        string folder = Server.MapPath("~/uploads/recipes/");
+                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                        string fileName = Guid.NewGuid().ToString("N") + ext;
+                        string fullPath = Path.Combine(folder, fileName);
+                        fuRecipeThumb.SaveAs(fullPath);
+                        newThumb = "~/uploads/recipes/" + fileName;
+                    }
 
-                SqlParameter[] p = {
-                    new SqlParameter("@CourseTypeID", courseTypeId),
-                    new SqlParameter("@RecipeTitle",  title),
-                    new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
-                    new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
-                    new SqlParameter("@Duration",     duration),
-                    new SqlParameter("@Difficulty",   difficulty),
-                    new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(thumb) ? "images/momo_dish.jpg" : thumb),
-                    new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video)
-                };
+                    string sql = @"UPDATE Recipe SET CourseTypeID=@CourseTypeID, RecipeTitle=@RecipeTitle, Description=@Description, Ingredients=@Ingredients, Duration=@Duration, Difficulty=@Difficulty, Thumbnail=@Thumbnail, VideoURL=@VideoURL WHERE RecipeID=@RecipeID";
+                    SqlParameter[] p = {
+                        new SqlParameter("@CourseTypeID", courseTypeId),
+                        new SqlParameter("@RecipeTitle",  title),
+                        new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                        new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
+                        new SqlParameter("@Duration",     duration),
+                        new SqlParameter("@Difficulty",   difficulty),
+                        new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(newThumb) ? "images/momo_dish.jpg" : newThumb),
+                        new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video),
+                        new SqlParameter("@RecipeID",     editId)
+                    };
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    hfEditRecipeId.Value = "";
+                    btnAddRecipe.Text = "Save Recipe";
+                    ShowAdminMsg("Recipe updated successfully.", true);
+                }
+                else
+                {
+                    // Handle uploaded file if provided
+                    string newThumb = thumb;
+                    if (fuRecipeThumb.HasFile)
+                    {
+                        string[] allowed = new[] { ".png", ".jpg", ".jpeg", ".webp", ".gif" };
+                        string ext = Path.GetExtension(fuRecipeThumb.FileName).ToLowerInvariant();
+                        if (Array.IndexOf(allowed, ext) < 0)
+                        {
+                            ShowAdminMsg("Invalid image type. Allowed: jpg, png, webp, gif.", false);
+                            return;
+                        }
+                        if (fuRecipeThumb.PostedFile.ContentLength > 5 * 1024 * 1024)
+                        {
+                            ShowAdminMsg("Image too large (max 5MB).", false);
+                            return;
+                        }
+                        string folder = Server.MapPath("~/uploads/recipes/");
+                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                        string fileName = Guid.NewGuid().ToString("N") + ext;
+                        string fullPath = Path.Combine(folder, fileName);
+                        fuRecipeThumb.SaveAs(fullPath);
+                        newThumb = "~/uploads/recipes/" + fileName;
+                    }
 
-                DbHelper.ExecuteNonQuery(sql, p);
-                txtRecipeTitle.Text       = "";
-                txtRecipeDesc.Text        = "";
-                txtRecipeIngredients.Text = "";
-                txtRecipeDuration.Text    = "";
-                txtRecipeThumb.Text       = "";
-                txtRecipeVideo.Text       = "";
+                    string sql = @"INSERT INTO Recipe (CourseTypeID, RecipeTitle, Description, Ingredients, Duration, Difficulty, Thumbnail, VideoURL, CreatedAt)
+                                   VALUES (@CourseTypeID, @RecipeTitle, @Description, @Ingredients, @Duration, @Difficulty, @Thumbnail, @VideoURL, GETDATE())";
+
+                    SqlParameter[] p = {
+                        new SqlParameter("@CourseTypeID", courseTypeId),
+                        new SqlParameter("@RecipeTitle",  title),
+                        new SqlParameter("@Description",  string.IsNullOrEmpty(desc) ? (object)DBNull.Value : desc),
+                        new SqlParameter("@Ingredients",  string.IsNullOrEmpty(ingredients) ? (object)DBNull.Value : ingredients),
+                        new SqlParameter("@Duration",     duration),
+                        new SqlParameter("@Difficulty",   difficulty),
+                        new SqlParameter("@Thumbnail",    string.IsNullOrEmpty(newThumb) ? "images/momo_dish.jpg" : newThumb),
+                        new SqlParameter("@VideoURL",     string.IsNullOrEmpty(video) ? (object)DBNull.Value : video)
+                    };
+
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    txtRecipeTitle.Text       = "";
+                    txtRecipeDesc.Text        = "";
+                    txtRecipeIngredients.Text = "";
+                    txtRecipeDuration.Text    = "";
+                    txtRecipeThumb.Text       = "";
+                    txtRecipeVideo.Text       = "";
+                    ShowAdminMsg("Recipe '" + title + "' added successfully!", true);
+                }
                 LoadOverviewMetrics();
                 PopulateDropdowns();
-                ShowAdminMsg("Recipe '" + title + "' added successfully!", true);
             }
             catch (Exception ex)
             {
-                ShowAdminMsg("Error adding recipe: " + ex.Message, false);
+                ShowAdminMsg("Error adding/updating recipe: " + ex.Message, false);
             }
             ShowTab("recipes");
         }
@@ -861,16 +1067,36 @@ namespace KneadLMS
 
             try
             {
-                string sql = "INSERT INTO RecipeStep (RecipeID, StepNumber, Instruction) VALUES (@RecipeID, @StepNumber, @Instruction)";
-                SqlParameter[] p = {
-                    new SqlParameter("@RecipeID",    recipeId),
-                    new SqlParameter("@StepNumber",  stepNum),
-                    new SqlParameter("@Instruction", instruction)
-                };
-                DbHelper.ExecuteNonQuery(sql, p);
+                // If editing an existing step update, otherwise insert
+                if (!string.IsNullOrEmpty(hfEditStepId.Value))
+                {
+                    int editStepId = Convert.ToInt32(hfEditStepId.Value);
+                    string sql = "UPDATE RecipeStep SET StepNumber=@StepNumber, Instruction=@Instruction WHERE StepID=@StepID";
+                    SqlParameter[] p = {
+                        new SqlParameter("@StepNumber",  stepNum),
+                        new SqlParameter("@Instruction", instruction),
+                        new SqlParameter("@StepID", editStepId)
+                    };
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    hfEditStepId.Value = "";
+                    try { btnAddStep.Text = "Add Step"; } catch { }
+                    ShowAdminMsg("Recipe step updated.", true);
+                }
+                else
+                {
+                    string sql = "INSERT INTO RecipeStep (RecipeID, StepNumber, Instruction) VALUES (@RecipeID, @StepNumber, @Instruction)";
+                    SqlParameter[] p = {
+                        new SqlParameter("@RecipeID",    recipeId),
+                        new SqlParameter("@StepNumber",  stepNum),
+                        new SqlParameter("@Instruction", instruction)
+                    };
+                    DbHelper.ExecuteNonQuery(sql, p);
+                    ShowAdminMsg("Recipe Step " + stepNum + " added successfully!", true);
+                }
                 txtStepInstruction.Text = "";
                 txtStepNumber.Text      = "";
-                ShowAdminMsg("Recipe Step " + stepNum + " added successfully!", true);
+                // Refresh steps list
+                BindRecipeSteps(recipeId);
             }
             catch (Exception ex)
             {
