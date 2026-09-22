@@ -53,14 +53,14 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="db\migrations\20260919_add_cuisineid.sql" />
+    <Content Include="db\01_create_database_and_schema.sql" />
+    <Content Include="db\migrations\ensure_cuisineid_column.sql" />
     <Content Include="db\scripts\20260919_recipe_identity_diagnostics_and_reseed.sql" />
     <Content Include="styles\*.css" />
     <Content Include="script.js" />
     <Content Include="images\hero_cooking.jpg" />
     <Content Include="images\momo_dish.jpg" />
     <Content Include="Web.config" />
-    <Content Include="schema.sql" />
     <Content Include="Site.Master" />
     <Content Include="Default.aspx" />
     <Content Include="Home.aspx" />
@@ -215,6 +215,9 @@
   <ItemGroup>
     <Folder Include=".git\hooks\" />
     <Folder Include="App_Code\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="db\README.md" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

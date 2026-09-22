@@ -1,0 +1,84 @@
+KneadDB — database scripts
+==========================
+
+This directory contains SQL scripts used to create and maintain the KneadDB database for the Knead culinary LMS web application.
+
+Files and purpose
+-----------------
+- 01_create_database_and_schema.sql
+  - Primary schema + seed script. Creates the KneadDB database (if missing), all tables, constraints, and initial seed rows. Run this to create a fresh local database.
+
+- migrations/ensure_cuisineid_column.sql
+  - Migration to ensure the Cuisine table exposes a column named `CuisineID`. It will rename an existing id-like column or add a new IDENTITY column when necessary. Run when migrating an existing database with schema variations.
+
+- scripts/20260919_recipe_identity_diagnostics_and_reseed.sql
+  - Diagnostics and safe `DBCC CHECKIDENT` reseed script for the `Recipe` table. Use this to inspect IDENT_CURRENT and MAX(RecipeID) and to reseed identity safely. Run only after a DB backup and while the app is not writing to the table.
+
+Recommended run order (for a new environment)
+---------------------------------------------
+1. Backup any existing database you care about. These scripts may DROP and CREATE tables.
+2. Run db/01_create_database_and_schema.sql in SSMS or via sqlcmd. This creates KneadDB and seeds initial data.
+3. If you have schema differences to fix, run files in db/migrations/ in order (they are named descriptively). For example:
+   - db/migrations/ensure_cuisineid_column.sql
+4. Use scripts in db/scripts/ for diagnostics and maintenance (e.g., reseed identity) as-needed. These are not required during initial creation.
+
+Safety and cautions
+-------------------
+- ALWAYS take a backup before running migration or reseed scripts on a non-development database.
+- The reseed script should be run only when the application is stopped or write activity is paused.
+- These scripts are intended for local development or controlled maintenance. Review the SQL before execution in production.
+
+Run the scripts on another PC (quick guide)
+------------------------------------------
+Prerequisites on target machine:
+- Microsoft SQL Server (Express) or LocalDB installed (LocalDB is sufficient for development).
+- SQL Server Management Studio (SSMS) or sqlcmd utility available.
+- Visual Studio (to open the solution) if you want to run and debug the web app.
+
+Steps:
+1. Clone the repo:
+   git clone https://github.com/Luckyishim/Knead.git
+   cd "Knead_Assignment"
+
+2. Update connection string (if needed):
+   - Open Web.config and verify the `connectionStrings` entry named `KneadDB`.
+   - For LocalDB (default), connectionString is usually:
+	 Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=KneadDB;Integrated Security=True;TrustServerCertificate=True;
+   - If using a different SQL Server instance, update Data Source, User ID and Password accordingly.
+
+3. Create the database and schema:
+   Option A: Use SSMS
+	 - Open SSMS, connect to your SQL Server instance (or (localdb)\MSSQLLocalDB).
+	 - Open db/01_create_database_and_schema.sql and execute the script.
+
+   Option B: Use sqlcmd (PowerShell)
+	 - Example for LocalDB:
+	   sqlcmd -S "(localdb)\MSSQLLocalDB" -i "db/01_create_database_and_schema.sql"
+	 - Example for a named instance (replace SERVERNAME and instance):
+	   sqlcmd -S "SERVERNAME\INSTANCE" -i "db/01_create_database_and_schema.sql"
+
+4. Run migrations (if required):
+   - Execute any scripts in db/migrations/ in order. For example:
+	 sqlcmd -S "(localdb)\MSSQLLocalDB" -i "db/migrations/ensure_cuisineid_column.sql"
+
+5. (Optional) Run maintenance scripts
+   - To check and reseed Recipe identity (only if you observed identity gaps):
+	 - Open db/scripts/20260919_recipe_identity_diagnostics_and_reseed.sql in SSMS and run the SELECT checks first.
+	 - If verified and after backup, run the reseed portion.
+
+6. Run the web app
+   - Open Knead.sln in Visual Studio and press F5 (IIS Express) or Start Debugging.
+   - The application uses the connection string in Web.config to connect to KneadDB.
+
+Notes
+-----
+- If you prefer, you can copy the SQL files to a central deployment pipeline or wrap them in a small PowerShell script to run in sequence.
+- If you need a non-LocalDB SQL Server, create the database on that server and update Web.config accordingly.
+
+Need help?
+----------
+If you want, I can:
+- Add a numbered migration file for the reseed script (e.g., db/scripts/02_reseed_recipe_identity.sql).
+- Create a PowerShell helper that runs the scripts in order against a given connection string.
+- Produce a short checklist (one-shot commands) you can copy/paste to set up a new machine.
+

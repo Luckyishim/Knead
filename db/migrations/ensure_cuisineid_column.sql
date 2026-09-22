@@ -1,7 +1,7 @@
--- Migration: Add or rename CuisineID column
--- File: db/migrations/20260919_add_cuisineid.sql
--- IMPORTANT: BACKUP your database before running this script.
--- Run in SSMS connected to the KneadDB database.
+-- db/migrations/ensure_cuisineid_column.sql
+-- Purpose: Ensure the Cuisine table has a column named CuisineID. If a different id-like column exists
+-- it will be renamed to CuisineID. If none exists, a new INT IDENTITY column named CuisineID will be added.
+-- Run in SSMS against the KneadDB database after backup.
 
 SET NOCOUNT ON;
 BEGIN TRY
@@ -38,18 +38,6 @@ BEGIN TRY
 	BEGIN
 		PRINT 'Found existing column: ' + @existingCandidate + '. Will rename to ' + @targetCol + '.\n';
 
-		-- List foreign keys that reference the table (informational)
-		SELECT
-			fk.name AS ForeignKeyName,
-			OBJECT_SCHEMA_NAME(fk.parent_object_id) AS ChildSchema,
-			OBJECT_NAME(fk.parent_object_id) AS ChildTable
-		FROM sys.foreign_key_columns fkc
-		JOIN sys.foreign_keys fk ON fkc.constraint_object_id = fk.object_id
-		JOIN sys.columns rc ON rc.object_id = fk.referenced_object_id AND rc.column_id = fkc.referenced_column_id
-		WHERE fk.referenced_object_id = OBJECT_ID(@fullTable)
-		  AND rc.name = @existingCandidate;
-
-		-- Perform rename (may require maintaining dependent code)
 		DECLARE @renameSql NVARCHAR(MAX) = N'EXEC sp_rename ''' + @schemaName + '.' + @tableName + '.' + @existingCandidate + ''', ''' + @targetCol + ''', ''COLUMN'';';
 		PRINT @renameSql;
 		EXEC sp_executesql @renameSql;
@@ -62,20 +50,17 @@ BEGIN TRY
 	-- 3) No id-like column found: add a new CuisineID column (IDENTITY)
 	PRINT 'No id-like column found. Will add new column ' + @targetCol + ' INT IDENTITY(1,1).\n';
 
-	-- Check whether table already has a PRIMARY KEY
 	DECLARE @hasPK BIT = CASE WHEN EXISTS (
 		SELECT 1 FROM sys.key_constraints kc
 		WHERE kc.parent_object_id = OBJECT_ID(@fullTable) AND kc.type = 'PK'
 	) THEN 1 ELSE 0 END;
 
-	-- Add the new column (identity)
 	DECLARE @addColSql NVARCHAR(MAX) = N'ALTER TABLE ' + @fullTable + ' ADD ' + QUOTENAME(@targetCol) + ' INT IDENTITY(1,1) NOT NULL;';
 	PRINT @addColSql;
 	EXEC sp_executesql @addColSql;
 
 	IF @hasPK = 0
 	BEGIN
-		-- create a PK constraint on the new column
 		DECLARE @pkName SYSNAME = 'PK_' + @tableName + '_' + @targetCol;
 		DECLARE @addPkSql NVARCHAR(MAX) = N'ALTER TABLE ' + @fullTable + ' ADD CONSTRAINT ' + QUOTENAME(@pkName) + ' PRIMARY KEY CLUSTERED (' + QUOTENAME(@targetCol) + ');';
 		PRINT @addPkSql;
