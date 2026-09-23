@@ -8,19 +8,10 @@ Files and purpose
 - 01_create_database_and_schema.sql
   - Primary schema + seed script. Creates the KneadDB database (if missing), all tables, constraints, and initial seed rows. Run this to create a fresh local database.
 
-- migrations/ensure_cuisineid_column.sql
-  - Migration to ensure the Cuisine table exposes a column named `CuisineID`. It will rename an existing id-like column or add a new IDENTITY column when necessary. Run when migrating an existing database with schema variations.
-
-- scripts/20260919_recipe_identity_diagnostics_and_reseed.sql
-  - Diagnostics and safe `DBCC CHECKIDENT` reseed script for the `Recipe` table. Use this to inspect IDENT_CURRENT and MAX(RecipeID) and to reseed identity safely. Run only after a DB backup and while the app is not writing to the table.
-
-Recommended run order (for a new environment)
+Recommended setup (for a new environment)
 ---------------------------------------------
-1. Backup any existing database you care about. These scripts may DROP and CREATE tables.
+1. Backup any existing database you care about.
 2. Run db/01_create_database_and_schema.sql in SSMS or via sqlcmd. This creates KneadDB and seeds initial data.
-3. If you have schema differences to fix, run files in db/migrations/ in order (they are named descriptively). For example:
-   - db/migrations/ensure_cuisineid_column.sql
-4. Use scripts in db/scripts/ for diagnostics and maintenance (e.g., reseed identity) as-needed. These are not required during initial creation.
 
 Safety and cautions
 -------------------
@@ -57,16 +48,7 @@ Steps:
 	 - Example for a named instance (replace SERVERNAME and instance):
 	   sqlcmd -S "SERVERNAME\INSTANCE" -i "db/01_create_database_and_schema.sql"
 
-4. Run migrations (if required):
-   - Execute any scripts in db/migrations/ in order. For example:
-	 sqlcmd -S "(localdb)\MSSQLLocalDB" -i "db/migrations/ensure_cuisineid_column.sql"
-
-5. (Optional) Run maintenance scripts
-   - To check and reseed Recipe identity (only if you observed identity gaps):
-	 - Open db/scripts/20260919_recipe_identity_diagnostics_and_reseed.sql in SSMS and run the SELECT checks first.
-	 - If verified and after backup, run the reseed portion.
-
-6. Run the web app
+4. Run the web app
    - Open Knead.sln in Visual Studio and press F5 (IIS Express) or Start Debugging.
    - The application uses the connection string in Web.config to connect to KneadDB.
 

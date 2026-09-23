@@ -54,8 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="db\01_create_database_and_schema.sql" />
-    <Content Include="db\migrations\ensure_cuisineid_column.sql" />
-    <Content Include="db\scripts\20260919_recipe_identity_diagnostics_and_reseed.sql" />
     <Content Include="styles\*.css" />
     <Content Include="script.js" />
     <Content Include="images\hero_cooking.jpg" />
