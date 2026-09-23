@@ -64,6 +64,7 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.HiddenField hfEditCuisineId;
         protected global::System.Web.UI.WebControls.Button btnAddCuisine;
         protected global::System.Web.UI.WebControls.Button btnAddStep;
+        protected global::System.Web.UI.WebControls.Button btnCancelStepEdit;
         protected global::System.Web.UI.WebControls.Button btnAddRecipe;
 
         protected global::System.Web.UI.WebControls.TextBox txtCourseTypeName;
@@ -83,6 +84,9 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.TextBox txtStepNumber;
         protected global::System.Web.UI.WebControls.TextBox txtStepInstruction;
         protected global::System.Web.UI.WebControls.TextBox txtStepImage;
+        protected global::System.Web.UI.WebControls.TextBox txtBulkSteps;
+        protected global::System.Web.UI.WebControls.Button btnAddStepsBulk;
+        protected global::System.Web.UI.WebControls.Button btnDeleteAllSteps;
         protected global::System.Web.UI.WebControls.HiddenField hfEditStepId;
         protected global::System.Web.UI.WebControls.GridView gvRecipeSteps;
         // Media manager controls

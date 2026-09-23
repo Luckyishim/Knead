@@ -108,35 +108,105 @@ namespace KneadLMS
                 {
                     var r = dt.Rows[0];
                     hfEditStepId.Value = r["StepID"].ToString();
-                    ddlStepRecipe.SelectedValue = r["RecipeID"].ToString();
+                    try { ddlStepRecipe.SelectedValue = r["RecipeID"].ToString(); } catch { }
                     txtStepNumber.Text = r["StepNumber"].ToString();
                     txtStepInstruction.Text = r["Instruction"].ToString();
-                    // btnAddStep is declared in markup; ensure designer contains it. If not, fall back to client text change
                     try { btnAddStep.Text = "Update Step"; } catch { }
+                    try { btnCancelStepEdit.Visible = true; } catch { }
                     ShowTab("recipes");
                 }
+                return;
+            }
+
+            if (string.Equals(e.CommandName, "DeleteStep", StringComparison.OrdinalIgnoreCase))
+            {
+                int stepId = Convert.ToInt32(e.CommandArgument);
+                try
+                {
+                    DataTable dt = DbHelper.ExecuteQuery("SELECT RecipeID FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                    int recipeId = 0;
+                    if (dt.Rows.Count > 0)
+                    {
+                        recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
+                    }
+                    else if (!string.IsNullOrEmpty(ddlStepRecipe.SelectedValue))
+                    {
+                        int.TryParse(ddlStepRecipe.SelectedValue, out recipeId);
+                    }
+
+                    DbHelper.ExecuteNonQuery("DELETE FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+
+                    if (recipeId > 0)
+                    {
+                        // Resequence remaining steps to ensure clean 1..N order
+                        DataTable remaining = DbHelper.ExecuteQuery("SELECT StepID FROM RecipeStep WHERE RecipeID=@RecipeID ORDER BY StepNumber ASC, StepID ASC", new[] { new SqlParameter("@RecipeID", recipeId) });
+                        for (int i = 0; i < remaining.Rows.Count; i++)
+                        {
+                            int sId = Convert.ToInt32(remaining.Rows[i]["StepID"]);
+                            DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber=@StepNum WHERE StepID=@StepID", new[] { new SqlParameter("@StepNum", i + 1), new SqlParameter("@StepID", sId) });
+                        }
+                        BindRecipeSteps(recipeId);
+                    }
+                    ShowAdminMsg("Recipe step deleted successfully.", true);
+                }
+                catch (Exception ex)
+                {
+                    ShowAdminMsg("Error deleting step: " + ex.Message, false);
+                }
+                ShowTab("recipes");
                 return;
             }
 
             if (string.Equals(e.CommandName, "MoveUp", StringComparison.OrdinalIgnoreCase) || string.Equals(e.CommandName, "MoveDown", StringComparison.OrdinalIgnoreCase))
             {
                 int stepId = Convert.ToInt32(e.CommandArgument);
-                // Load current step to get RecipeID and StepNumber
-                DataTable dt = DbHelper.ExecuteQuery("SELECT RecipeID, StepNumber FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
-                if (dt.Rows.Count == 0) return;
-                int recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
-                int stepNum = Convert.ToInt32(dt.Rows[0]["StepNumber"]);
-                if (e.CommandName == "MoveUp") stepNum--; else stepNum++;
-                // Find step that currently occupies target slot and swap numbers
-                DataTable other = DbHelper.ExecuteQuery("SELECT TOP 1 StepID, StepNumber FROM RecipeStep WHERE RecipeID=@RecipeID AND StepNumber=@StepNumber", new[] { new SqlParameter("@RecipeID", recipeId), new SqlParameter("@StepNumber", stepNum) });
-                DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = -1 WHERE StepID = @StepID", new[] { new SqlParameter("@StepID", stepId) });
-                if (other.Rows.Count > 0)
+                try
                 {
-                    int otherId = Convert.ToInt32(other.Rows[0]["StepID"]);
-                    DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", Convert.ToInt32(other.Rows[0]["StepNumber"] == DBNull.Value ? stepNum : other.Rows[0]["StepNumber"])), new SqlParameter("@StepID", otherId) });
+                    DataTable dt = DbHelper.ExecuteQuery("SELECT RecipeID, StepNumber FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                    if (dt.Rows.Count == 0) return;
+                    int recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
+                    bool isUp = e.CommandName.Equals("MoveUp", StringComparison.OrdinalIgnoreCase);
+
+                    // Fetch all steps in order
+                    DataTable allSteps = DbHelper.ExecuteQuery("SELECT StepID, StepNumber FROM RecipeStep WHERE RecipeID=@RecipeID ORDER BY StepNumber ASC, StepID ASC", new[] { new SqlParameter("@RecipeID", recipeId) });
+                    int currentIndex = -1;
+                    for (int i = 0; i < allSteps.Rows.Count; i++)
+                    {
+                        if (Convert.ToInt32(allSteps.Rows[i]["StepID"]) == stepId)
+                        {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (currentIndex >= 0)
+                    {
+                        int targetIndex = isUp ? currentIndex - 1 : currentIndex + 1;
+                        if (targetIndex >= 0 && targetIndex < allSteps.Rows.Count)
+                        {
+                            int otherId = Convert.ToInt32(allSteps.Rows[targetIndex]["StepID"]);
+                            int currentNum = Convert.ToInt32(allSteps.Rows[currentIndex]["StepNumber"]);
+                            int otherNum = Convert.ToInt32(allSteps.Rows[targetIndex]["StepNumber"]);
+
+                            if (currentNum == otherNum)
+                            {
+                                if (isUp) currentNum = otherNum - 1;
+                                else otherNum = currentNum - 1;
+                            }
+
+                            // Swap positions using temporary negative slot
+                            DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = -999 WHERE StepID = @StepID", new[] { new SqlParameter("@StepID", stepId) });
+                            DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", currentNum), new SqlParameter("@StepID", otherId) });
+                            DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", otherNum), new SqlParameter("@StepID", stepId) });
+                        }
+                    }
+                    BindRecipeSteps(recipeId);
                 }
-                DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber = @NewNum WHERE StepID = @StepID", new[] { new SqlParameter("@NewNum", stepNum), new SqlParameter("@StepID", stepId) });
-                BindRecipeSteps(recipeId);
+                catch (Exception ex)
+                {
+                    ShowAdminMsg("Error reordering step: " + ex.Message, false);
+                }
+                ShowTab("recipes");
                 return;
             }
         }
@@ -146,15 +216,35 @@ namespace KneadLMS
             int stepId = Convert.ToInt32(gvRecipeSteps.DataKeys[e.RowIndex].Value);
             try
             {
+                DataTable dt = DbHelper.ExecuteQuery("SELECT RecipeID FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
+                int recipeId = 0;
+                if (dt.Rows.Count > 0)
+                {
+                    recipeId = Convert.ToInt32(dt.Rows[0]["RecipeID"]);
+                }
+                else if (!string.IsNullOrEmpty(ddlStepRecipe.SelectedValue))
+                {
+                    int.TryParse(ddlStepRecipe.SelectedValue, out recipeId);
+                }
+
                 DbHelper.ExecuteNonQuery("DELETE FROM RecipeStep WHERE StepID=@StepID", new[] { new SqlParameter("@StepID", stepId) });
-                // reload steps for currently selected recipe
-                if (!string.IsNullOrEmpty(ddlStepRecipe.SelectedValue)) BindRecipeSteps(Convert.ToInt32(ddlStepRecipe.SelectedValue));
-                ShowAdminMsg("Step deleted.", true);
+                if (recipeId > 0)
+                {
+                    DataTable remaining = DbHelper.ExecuteQuery("SELECT StepID FROM RecipeStep WHERE RecipeID=@RecipeID ORDER BY StepNumber ASC, StepID ASC", new[] { new SqlParameter("@RecipeID", recipeId) });
+                    for (int i = 0; i < remaining.Rows.Count; i++)
+                    {
+                        int sId = Convert.ToInt32(remaining.Rows[i]["StepID"]);
+                        DbHelper.ExecuteNonQuery("UPDATE RecipeStep SET StepNumber=@StepNum WHERE StepID=@StepID", new[] { new SqlParameter("@StepNum", i + 1), new SqlParameter("@StepID", sId) });
+                    }
+                    BindRecipeSteps(recipeId);
+                }
+                ShowAdminMsg("Recipe step deleted.", true);
             }
             catch (Exception ex)
             {
                 ShowAdminMsg("Error deleting step: " + ex.Message, false);
             }
+            ShowTab("recipes");
         }
 
         // Attempts to find the actual column name on a table from a list of candidates.
@@ -1099,6 +1189,7 @@ namespace KneadLMS
                     DbHelper.ExecuteNonQuery(sql, p);
                     hfEditStepId.Value = "";
                     try { btnAddStep.Text = "Add Step"; } catch { }
+                    try { btnCancelStepEdit.Visible = false; } catch { }
                     ShowAdminMsg("Recipe step updated.", true);
                 }
                 else
@@ -1114,12 +1205,133 @@ namespace KneadLMS
                 }
                 txtStepInstruction.Text = "";
                 txtStepNumber.Text      = "";
+                try { btnCancelStepEdit.Visible = false; } catch { }
                 // Refresh steps list
                 BindRecipeSteps(recipeId);
             }
             catch (Exception ex)
             {
                 ShowAdminMsg("Error adding step: " + ex.Message, false);
+            }
+            ShowTab("recipes");
+        }
+
+        protected void btnCancelStepEdit_Click(object sender, EventArgs e)
+        {
+            hfEditStepId.Value = "";
+            txtStepNumber.Text = "";
+            txtStepInstruction.Text = "";
+            try { btnAddStep.Text = "Add Step"; } catch { }
+            try { btnCancelStepEdit.Visible = false; } catch { }
+            ShowTab("recipes");
+        }
+
+        protected void btnAddStepsBulk_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(ddlStepRecipe.SelectedValue))
+            {
+                ShowAdminMsg("Please select a recipe first.", false);
+                ShowTab("recipes");
+                return;
+            }
+
+            int recipeId = Convert.ToInt32(ddlStepRecipe.SelectedValue);
+            string rawBulk = txtBulkSteps.Text;
+
+            if (string.IsNullOrWhiteSpace(rawBulk))
+            {
+                ShowAdminMsg("Please enter at least one step instruction in the bulk steps field.", false);
+                ShowTab("recipes");
+                return;
+            }
+
+            string[] lines = rawBulk.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var stepsToInsert = new System.Collections.Generic.List<string>();
+            foreach (string line in lines)
+            {
+                string trimmed = line.Trim();
+                if (!string.IsNullOrEmpty(trimmed))
+                {
+                    stepsToInsert.Add(trimmed);
+                }
+            }
+
+            if (stepsToInsert.Count == 0)
+            {
+                ShowAdminMsg("Please enter at least one valid step instruction.", false);
+                ShowTab("recipes");
+                return;
+            }
+
+            try
+            {
+                // Find current maximum StepNumber for this recipe to assign sequential numbers
+                int nextStepNum = 1;
+                object maxObj = DbHelper.ExecuteScalar(
+                    "SELECT MAX(StepNumber) FROM RecipeStep WHERE RecipeID = @RecipeID",
+                    new[] { new SqlParameter("@RecipeID", recipeId) }
+                );
+
+                if (maxObj != null && maxObj != DBNull.Value)
+                {
+                    int currentMax;
+                    if (int.TryParse(maxObj.ToString(), out currentMax))
+                    {
+                        nextStepNum = currentMax + 1;
+                    }
+                }
+
+                int countInserted = 0;
+                string insertSql = "INSERT INTO RecipeStep (RecipeID, StepNumber, Instruction) VALUES (@RecipeID, @StepNumber, @Instruction)";
+                foreach (string stepInstruction in stepsToInsert)
+                {
+                    SqlParameter[] p = {
+                        new SqlParameter("@RecipeID",    recipeId),
+                        new SqlParameter("@StepNumber",  nextStepNum),
+                        new SqlParameter("@Instruction", stepInstruction)
+                    };
+                    DbHelper.ExecuteNonQuery(insertSql, p);
+                    nextStepNum++;
+                    countInserted++;
+                }
+
+                txtBulkSteps.Text = "";
+                BindRecipeSteps(recipeId);
+                ShowAdminMsg(countInserted + " step(s) added successfully!", true);
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error adding bulk steps: " + ex.Message, false);
+            }
+            ShowTab("recipes");
+        }
+
+        protected void btnDeleteAllSteps_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(ddlStepRecipe.SelectedValue))
+            {
+                ShowAdminMsg("Please select a recipe first.", false);
+                ShowTab("recipes");
+                return;
+            }
+
+            int recipeId = Convert.ToInt32(ddlStepRecipe.SelectedValue);
+            try
+            {
+                int deletedCount = DbHelper.ExecuteNonQuery("DELETE FROM RecipeStep WHERE RecipeID = @RecipeID", new[] { new SqlParameter("@RecipeID", recipeId) });
+                BindRecipeSteps(recipeId);
+                if (deletedCount > 0)
+                {
+                    ShowAdminMsg("All " + deletedCount + " step(s) for the selected recipe have been deleted.", true);
+                }
+                else
+                {
+                    ShowAdminMsg("No steps existed for this recipe to delete.", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowAdminMsg("Error deleting all steps: " + ex.Message, false);
             }
             ShowTab("recipes");
         }

@@ -313,6 +313,28 @@ img {
   transform: translateY(-1px);
 }
 
+.btn-secondary {
+  padding: 12px 24px;
+  background-color: var(--primary-green);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-green-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(43, 56, 43, 0.25);
+}
+
 .badge-tag {
   display: inline-block;
   padding: 4px 12px;

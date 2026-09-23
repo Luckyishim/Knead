@@ -239,7 +239,7 @@ select.form-control {
 }
 
 /* ==========================================================================
-   PRIMARY BUTTON
+   BUTTONS (Primary & Secondary)
    ========================================================================== */
 .btn-primary {
   background-color: #FF8A00;
@@ -264,6 +264,32 @@ select.form-control {
 }
 
 .btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--primary-green, #2B382B);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 12px;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-green-hover, #1F2B1F);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(43, 56, 43, 0.28);
+}
+
+.btn-secondary:active {
   transform: translateY(0);
 }
 
@@ -435,6 +461,25 @@ select.form-control {
   background-color: #57534E;
   color: #FFFFFF;
   border-color: #57534E;
+}
+
+.grid-btn.up,
+.grid-btn.down,
+.grid-btn.move {
+  color: #4B5563;
+  border-color: #D1D5DB;
+  background-color: #F9FAFB;
+  padding: 5px 10px;
+  font-size: 11.5px;
+}
+
+.grid-btn.up:hover,
+.grid-btn.down:hover,
+.grid-btn.move:hover {
+  background-color: #E5E7EB;
+  color: #111827;
+  border-color: #9CA3AF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .actions-col,

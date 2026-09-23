@@ -277,28 +277,44 @@
               <asp:TextBox ID="txtStepInstruction" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control"></asp:TextBox>
             </div>
           </div>
-          <asp:Button ID="btnAddStep" runat="server" Text="Add Step" OnClick="btnAddStep_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+          <div style="display:flex; align-items:center; gap:8px;">
+            <asp:Button ID="btnAddStep" runat="server" Text="Add Step" OnClick="btnAddStep_Click" CssClass="btn-primary" Style="margin-top: 12px;" />
+            <asp:Button ID="btnCancelStepEdit" runat="server" Text="Cancel Edit" OnClick="btnCancelStepEdit_Click" CssClass="grid-btn cancel" Visible="false" Style="margin-top: 12px; height: 42px;" />
+          </div>
+
+          <!-- Bulk add steps: paste one instruction per line -->
+          <div style="margin-top:14px;">
+            <label>Bulk Add Steps (one instruction per line)</label>
+            <asp:TextBox ID="txtBulkSteps" runat="server" TextMode="MultiLine" Rows="6" CssClass="form-control" placeholder="Paste each instruction on its own line"></asp:TextBox>
+            <asp:Button ID="btnAddStepsBulk" runat="server" Text="Add Steps (Bulk)" OnClick="btnAddStepsBulk_Click" CssClass="btn-secondary" Style="margin-top:8px;" />
+          </div>
         </div>
 
         <asp:HiddenField ID="hfEditStepId" runat="server" />
 
         <div class="continue-learning-section" style="margin-top: 18px;">
-          <h4>Recipe Steps</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="margin: 0;">Recipe Steps</h4>
+            <asp:Button ID="btnDeleteAllSteps" runat="server" Text="Delete All Steps" OnClick="btnDeleteAllSteps_Click"
+              OnClientClick="return confirm('Are you sure you want to delete ALL steps for the selected recipe? This action cannot be undone.');"
+              CssClass="grid-btn delete" Style="padding: 6px 14px; font-size: 12.5px;" />
+          </div>
           <div class="table-card">
             <div class="table-responsive">
               <asp:GridView ID="gvRecipeSteps" runat="server" AutoGenerateColumns="False" CssClass="table" CellPadding="0" DataKeyNames="StepID"
+                EmptyDataText="No recipe steps found. Select a recipe and add steps above."
                 OnRowCommand="gvRecipeSteps_RowCommand" OnRowDeleting="gvRecipeSteps_RowDeleting">
                 <Columns>
-                  <asp:BoundField DataField="StepNumber" HeaderText="#" />
+                  <asp:BoundField DataField="StepNumber" HeaderText="#" ItemStyle-Width="50px" ItemStyle-Font-Bold="true" />
                   <asp:BoundField DataField="Instruction" HeaderText="Instruction" />
                   <asp:TemplateField HeaderText="Actions" HeaderStyle-CssClass="actions-header">
                     <ItemStyle CssClass="actions-col" />
                     <ItemTemplate>
                       <div class="grid-actions">
                         <asp:LinkButton ID="lnkEditStep" runat="server" CommandName="EditStep" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn edit">Edit</asp:LinkButton>
-                        <asp:LinkButton ID="lnkUp" runat="server" CommandName="MoveUp" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn">Up</asp:LinkButton>
-                        <asp:LinkButton ID="lnkDown" runat="server" CommandName="MoveDown" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn">Down</asp:LinkButton>
-                        <asp:LinkButton ID="lnkDeleteStep" runat="server" CommandName="DeleteStep" CommandArgument='<%# Eval("StepID") %>' OnClientClick="return confirm('Delete this step?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
+                        <asp:LinkButton ID="lnkUp" runat="server" CommandName="MoveUp" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn up" ToolTip="Move Step Up">▲</asp:LinkButton>
+                        <asp:LinkButton ID="lnkDown" runat="server" CommandName="MoveDown" CommandArgument='<%# Eval("StepID") %>' CssClass="grid-btn down" ToolTip="Move Step Down">▼</asp:LinkButton>
+                        <asp:LinkButton ID="lnkDeleteStep" runat="server" CommandName="DeleteStep" CommandArgument='<%# Eval("StepID") %>' OnClientClick="return confirm('Are you sure you want to delete this step?');" CssClass="grid-btn delete">Delete</asp:LinkButton>
                       </div>
                     </ItemTemplate>
                   </asp:TemplateField>
