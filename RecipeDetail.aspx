@@ -64,7 +64,8 @@
         <button type="button" class="yt-play-btn" aria-label="Play video" style="pointer-events:auto; border:0; background:transparent;">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="30" fill="rgba(255,255,255,0.92)" />
-            <polygon points="26,20 48,32 26,44" fill="#111" />
+            <!-- Centered play triangle: base at x=24, tip at x=48; keeps vertical alignment at y=20/32/44 -->
+            <polygon points="24,20 48,32 24,44" fill="#111" />
           </svg>
         </button>
       </div>

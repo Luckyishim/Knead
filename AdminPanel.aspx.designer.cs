@@ -86,10 +86,6 @@ namespace KneadLMS
         protected global::System.Web.UI.WebControls.HiddenField hfEditStepId;
         protected global::System.Web.UI.WebControls.GridView gvRecipeSteps;
         // Media manager controls
-        protected global::System.Web.UI.WebControls.DropDownList ddlMediaRecipe;
-        protected global::System.Web.UI.WebControls.TextBox txtMediaImageUrl;
-        protected global::System.Web.UI.WebControls.FileUpload fuMediaImage;
-        protected global::System.Web.UI.WebControls.TextBox txtMediaVideoUrl;
-        protected global::System.Web.UI.WebControls.Button btnSaveMedia;
+        // Media manager controls removed
     }
 }

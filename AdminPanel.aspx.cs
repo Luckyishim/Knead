@@ -281,12 +281,6 @@ namespace KneadLMS
                 ddlQuizRecipe.DataValueField = "RecipeID";
                 ddlQuizRecipe.DataBind();
 
-                // Media manager recipe dropdown
-                ddlMediaRecipe.DataSource     = dtR;
-                ddlMediaRecipe.DataTextField  = "RecipeTitle";
-                ddlMediaRecipe.DataValueField = "RecipeID";
-                ddlMediaRecipe.DataBind();
-
                 DataTable dtQ = DbHelper.ExecuteQuery(
                     "SELECT QuizID, QuizTitle FROM Quiz ORDER BY QuizTitle");
                 ddlQuestionQuiz.DataSource     = dtQ;
@@ -700,84 +694,7 @@ namespace KneadLMS
             }
         }
 
-        protected void ddlMediaRecipe_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(ddlMediaRecipe.SelectedValue)) return;
-            int recipeId = Convert.ToInt32(ddlMediaRecipe.SelectedValue);
-            try
-            {
-                string sql = "SELECT Thumbnail, VideoURL FROM Recipe WHERE RecipeID = @RecipeID";
-                SqlParameter[] p = { new SqlParameter("@RecipeID", recipeId) };
-                DataTable dt = DbHelper.ExecuteQuery(sql, p);
-                if (dt.Rows.Count > 0)
-                {
-                    DataRow r = dt.Rows[0];
-                    txtMediaImageUrl.Text = r["Thumbnail"] != DBNull.Value ? r["Thumbnail"].ToString() : string.Empty;
-                    txtMediaVideoUrl.Text = r["VideoURL"] != DBNull.Value ? r["VideoURL"].ToString() : string.Empty;
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowAdminMsg("Error loading media: " + ex.Message, false);
-            }
-        }
-
-        protected void btnSaveMedia_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(ddlMediaRecipe.SelectedValue))
-            {
-                ShowAdminMsg("Please select a recipe to update.", false);
-                return;
-            }
-
-            int recipeId = Convert.ToInt32(ddlMediaRecipe.SelectedValue);
-            string imageUrl = txtMediaImageUrl.Text.Trim();
-            string videoUrl = txtMediaVideoUrl.Text.Trim();
-
-            try
-            {
-                // Handle uploaded image if provided
-                if (fuMediaImage.HasFile)
-                {
-                    string[] allowed = new[] { ".png", ".jpg", ".jpeg", ".webp", ".gif" };
-                    string ext = Path.GetExtension(fuMediaImage.FileName).ToLowerInvariant();
-                    if (Array.IndexOf(allowed, ext) < 0)
-                    {
-                        ShowAdminMsg("Invalid image type. Allowed: jpg, png, webp, gif.", false);
-                        return;
-                    }
-                    if (fuMediaImage.PostedFile.ContentLength > 5 * 1024 * 1024)
-                    {
-                        ShowAdminMsg("Image too large (max 5MB).", false);
-                        return;
-                    }
-
-                    string folder = Server.MapPath("~/uploads/recipes/");
-                    if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                    string fileName = Guid.NewGuid().ToString("N") + ext;
-                    string fullPath = Path.Combine(folder, fileName);
-                    fuMediaImage.SaveAs(fullPath);
-                    imageUrl = "~/uploads/recipes/" + fileName;
-                }
-
-                string sql = "UPDATE Recipe SET Thumbnail = @Thumb, VideoURL = @Video WHERE RecipeID = @RecipeID";
-                SqlParameter[] pars = {
-                    new SqlParameter("@Thumb", string.IsNullOrEmpty(imageUrl) ? (object)DBNull.Value : imageUrl),
-                    new SqlParameter("@Video", string.IsNullOrEmpty(videoUrl) ? (object)DBNull.Value : videoUrl),
-                    new SqlParameter("@RecipeID", recipeId)
-                };
-                DbHelper.ExecuteNonQuery(sql, pars);
-
-                txtMediaImageUrl.Text = imageUrl;
-                ShowAdminMsg("Media updated successfully.", true);
-                PopulateDropdowns();
-            }
-            catch (Exception ex)
-            {
-                ShowAdminMsg("Error saving media: " + ex.Message, false);
-            }
-            ShowTab("recipes");
-        }
+        // Media manager handlers removed — feature deprecated
 
         private void ShowTab(string tabName)
         {
