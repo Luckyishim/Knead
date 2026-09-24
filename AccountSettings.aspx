@@ -1,4 +1,4 @@
-<%@ Page Title="Account Settings - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="AccountSettings.aspx.cs" Inherits="KneadLMS.AccountSettings" %>
+<%@ Page Title="Account Settings - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="AccountSettings.aspx.cs" Inherits="KneadLMS.AccountSettings" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/account-settings.css" />

@@ -1,4 +1,4 @@
-<%@ Page Title="Quiz History - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="QuizHistory.aspx.cs" Inherits="KneadLMS.QuizHistory" %>
+<%@ Page Title="Quiz History - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="QuizHistory.aspx.cs" Inherits="KneadLMS.QuizHistory" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/quiz-history.css" />

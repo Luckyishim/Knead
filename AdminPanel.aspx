@@ -1,4 +1,4 @@
-<%@ Page Title="Admin Control Panel - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="AdminPanel.aspx.cs" Inherits="KneadLMS.AdminPanel" %>
+<%@ Page Title="Admin Control Panel - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="AdminPanel.aspx.cs" Inherits="KneadLMS.AdminPanel" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="styles/admin-panel.css" />

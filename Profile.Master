@@ -1,4 +1,4 @@
-<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Profile.Master.cs" Inherits="KneadLMS.ProfileMaster" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Profile.Master.cs" Inherits="KneadLMS.ProfileMaster" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,22 +12,33 @@
 </head>
 <body style="background-color: #FFFFFF; margin: 0; padding: 0;">
     <form id="formProfile" runat="server">
-        <!-- Top Minimal Header (Minimal Header with Back Button & Centered Logo - No Main Navbar) -->
-        <div class="quiz-top-bar" style="background: #FFFFFF; border-bottom: 1px solid var(--border-light); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;">
-            <a href="<%= GetBackUrl() %>" class="quiz-back-btn" title="Back" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F5EFEB; color: #1C1917; text-decoration: none; transition: background 0.2s;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </a>
+        <!-- Top Minimal Header (Back Button and Knead Logo together on the left, navigation on right) -->
+        <div class="quiz-top-bar" style="background: #FFFFFF; border-bottom: 1px solid var(--border-light); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <a href="<%= GetBackUrl() %>" class="quiz-back-btn" title="Back to Main Site" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F5EFEB; color: #1C1917; text-decoration: none; transition: background 0.2s;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </a>
 
-            <a href="Default.aspx" class="logo" title="Back to Home" style="gap: 8px; text-decoration: none;">
-                <div class="logo-icon" style="width: 34px; height: 34px; font-size: 18px;">k.</div>
-                <span class="logo-text">
-                    <h4 style="font-size: 20px; margin: 0;">knead<span>.</span></h4>
-                </span>
-            </a>
+                <a href="Default.aspx" class="logo" title="Back to Home" style="gap: 8px; text-decoration: none; display: flex; align-items: center;">
+                    <div class="logo-icon" style="width: 34px; height: 34px; font-size: 18px;">k.</div>
+                    <span class="logo-text">
+                        <h4 style="font-size: 20px; margin: 0;">knead<span>.</span></h4>
+                    </span>
+                </a>
+            </div>
 
-            <div style="width: 40px;"></div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <a href="Default.aspx" class="btn-action-outline" style="padding: 7px 14px; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; color: var(--text-main); border: 1px solid var(--border-medium); background: #FAF5F0;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Home Page
+                </a>
+                <a href="Logout.aspx" style="padding: 6px 12px; font-size: 12px; font-weight: 600; text-decoration: none; color: #DC2626; border: 1px solid #FCA5A5; background: #FEF2F2; border-radius: 8px;">Logout</a>
+            </div>
         </div>
 
         <!-- Main Content Area -->

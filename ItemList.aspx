@@ -1,5 +1,5 @@
 <%@ Page Title="Browse Cuisines & Recipes - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master"
-  AutoEventWireup="true" CodeFile="ItemList.aspx.cs" Inherits="KneadLMS.ItemList" %>
+  AutoEventWireup="true" CodeBehind="ItemList.aspx.cs" Inherits="KneadLMS.ItemList" %>
 
   <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="styles/item-list.css" />
@@ -54,7 +54,7 @@
               style="text-decoration: none; color: inherit;">
               <div class="cuisine-img-box">
                 <img
-                  src='<%# string.IsNullOrEmpty(Eval("Thumbnail").ToString()) ? "images/momo_dish.jpg" : Eval("Thumbnail") %>'
+                  src='<%# GetImageUrl(Eval("Thumbnail")) %>'
                   alt='<%# Eval("RecipeTitle") %>' />
               </div>
               <h4 style="margin-top: 12px; font-size: 16px; font-weight: 700;">

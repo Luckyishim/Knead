@@ -1,4 +1,4 @@
-<%@ Page Title="Saved Recipes - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="SavedRecipes.aspx.cs" Inherits="KneadLMS.SavedRecipes" %>
+<%@ Page Title="Saved Recipes - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="SavedRecipes.aspx.cs" Inherits="KneadLMS.SavedRecipes" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/saved-recipes.css" />
@@ -77,7 +77,7 @@
             <ItemTemplate>
               <a href='<%# "RecipeDetail.aspx?recipeId=" + Eval("RecipeID") %>' class="cuisine-card" style="text-decoration: none; color: inherit;">
                 <div class="cuisine-img-box" style="height: 180px;">
-                  <img src='<%# string.IsNullOrEmpty(Eval("Thumbnail").ToString()) ? "images/momo_dish.jpg" : Eval("Thumbnail") %>' alt='<%# Eval("RecipeTitle") %>' />
+                  <img src='<%# GetImageUrl(Eval("Thumbnail")) %>' alt='<%# Eval("RecipeTitle") %>' />
                 </div>
                 <h4 style="margin-top: 12px; font-size: 16px; font-weight: 700;"><%# Eval("RecipeTitle") %></h4>
                 <p style="font-size: 13px; color: var(--primary-orange); font-weight: 600; padding: 4px 6px 2px;"><%# Eval("CuisineName") %> • <%# Eval("CourseTypeName") %></p>

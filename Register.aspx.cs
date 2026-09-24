@@ -11,7 +11,7 @@ namespace KneadLMS
         {
             if (Session["UserID"] != null)
             {
-                Response.Redirect("UserDashboard.aspx");
+                Response.Redirect("Default.aspx");
             }
         }
 
@@ -63,7 +63,7 @@ namespace KneadLMS
                 Session["Email"] = email;
                 Session["Role"] = "Member";
 
-                Response.Redirect("UserDashboard.aspx");
+                Response.Redirect("Default.aspx");
             }
             catch (Exception ex)
             {

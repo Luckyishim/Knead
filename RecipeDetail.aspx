@@ -1,4 +1,4 @@
-<%@ Page Title="Recipe Detail - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="RecipeDetail.aspx.cs" Inherits="KneadLMS.RecipeDetail" %>
+<%@ Page Title="Recipe Detail - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="RecipeDetail.aspx.cs" Inherits="KneadLMS.RecipeDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/recipe-detail-page.css" />
@@ -49,92 +49,19 @@
       </div>
     </div>
 
-    <!-- Hero Video Player Container -->
-    <div class="video-player-box" style="position: relative; min-height: 60vh;">
-      <asp:Image ID="imgThumbnail" runat="server" ImageUrl="images/momo_dish.jpg" AlternateText="Tutorial Video Thumbnail" Style="width:100%; height:100%; object-fit:cover; display:block;" />
-      <asp:Panel ID="pnlVideoPlayer" runat="server" CssClass="video-embed-full" Style="position:absolute; left:0; top:0; width:100%; height:100%; z-index:0; background:transparent;" />
-      <div class="video-overlay-header" style="position:relative; z-index:2;">Masterclass Tutorial 🌶️</div>
-      <div class="video-overlay-title" style="position:relative; z-index:2;">
-        <asp:Literal ID="litVideoTitle" runat="server">Recipe Video Guide</asp:Literal><br/>
-        <span style="font-size: 18px; font-weight: 600; text-transform: none; opacity: 0.9;">Authentic Culinary Technique</span>
-      </div>
-
-      <!-- Centered play button -->
-      <div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; z-index:2; pointer-events:none;">
-        <button type="button" class="yt-play-btn" aria-label="Play video" style="pointer-events:auto; border:0; background:transparent;">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="30" fill="rgba(255,255,255,0.92)" />
-            <!-- Centered play triangle: base at x=24, tip at x=48; keeps vertical alignment at y=20/32/44 -->
-            <polygon points="24,20 48,32 24,44" fill="#111" />
-          </svg>
-        </button>
-      </div>
-      <div class="video-duration-badge" style="position:relative; z-index:2;"><asp:Literal ID="litVideoDuration" runat="server">12:45</asp:Literal></div>
+    <!-- Recipe Video Container (Full-width, 16:9, clean with zero overlays) -->
+    <div id="pnlVideoSection" runat="server" class="video-player-box" style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 20px; overflow: hidden; background-color: #000; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); margin-bottom: 32px;">
+      <iframe ID="iframeVideo" runat="server" frameborder="0"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 20px;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-    <script type="text/javascript">
-      (function () {
-        // Attach click handler to create iframe lazily when play button clicked
-        function ensurePlayer(container, videoUrl) {
-          if (!container) return;
-          if (container.dataset.playerCreated) return;
-          var id = 'yt-' + Math.random().toString(36).substr(2, 9);
-          var videoId = null;
-          if (!videoUrl) videoUrl = '';
-          // normalize ~/ prefix
-          if (videoUrl.indexOf('~/') === 0) {
-            videoUrl = window.location.origin + '/' + videoUrl.replace(/^~\//, '');
-          }
-          // extract youtube id with regex for many URL forms
-          var ytMatch = videoUrl.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
-          if (ytMatch && ytMatch[1]) videoId = ytMatch[1];
-          // fallback: query param v
-          if (!videoId) {
-            try {
-              var u = new URL(videoUrl, window.location.href);
-              var q = new URLSearchParams(u.search);
-              if (q.get('v')) videoId = q.get('v');
-            } catch (e) { }
-          }
-          var embedHtml = '';
-          if (videoId) {
-            // request autoplay (unmuted). Note: some browsers may block autoplay with sound.
-            embedHtml = '<iframe id="' + id + '" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
-          } else if (videoUrl) {
-            embedHtml = '<a href="' + videoUrl + '">Play video</a>';
-          }
-          container.innerHTML = embedHtml;
-          container.dataset.playerCreated = '1';
-        }
 
-        document.addEventListener('click', function (ev) {
-          var t = ev.target;
-          // Allow button or its SVG children
-          while (t && t !== document) {
-            if (t.classList && t.classList.contains('yt-play-btn')) {
-              var poster = t.closest('.video-player-box');
-              if (!poster) return;
-              // hide the poster image (imgThumbnail) but keep overlays visible
-              var img = poster.querySelector('#imgThumbnail');
-              if (img) { img.style.display = 'none'; }
-              var container = poster.querySelector('.video-embed-full');
-              if (container) {
-                // read data-video from server-injected panel
-                var videoUrl = container.getAttribute('data-video') || container.dataset.video || '';
-                ensurePlayer(container, videoUrl);
-                // hide the play button overlay after creating the player
-                try {
-                  var playBtn = poster.querySelector('.yt-play-btn');
-                  if (playBtn) playBtn.style.display = 'none';
-                } catch (e) {}
-              }
-              ev.preventDefault();
-              return;
-            }
-            t = t.parentNode;
-          }
-        }, false);
-      })();
-    </script>
+    <!-- Recipe Dish Photo Fallback (only shown if a recipe has no video) -->
+    <asp:Panel ID="pnlThumbnail" runat="server" Visible="false" Style="width: 100%; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 32px; max-height: 500px;">
+      <asp:Image ID="imgThumbnail" runat="server" ImageUrl="images/momo_dish.jpg" AlternateText="Recipe Dish Photo" Style="width:100%; height:100%; max-height:500px; object-fit:cover; display:block;" />
+    </asp:Panel>
 
     <!-- Tab Navigation -->
     <div class="detail-tab-nav">

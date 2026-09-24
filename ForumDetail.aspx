@@ -1,4 +1,4 @@
-<%@ Page Title="Forum Discussion - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="ForumDetail.aspx.cs" Inherits="KneadLMS.ForumDetail" %>
+<%@ Page Title="Forum Discussion - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ForumDetail.aspx.cs" Inherits="KneadLMS.ForumDetail" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/forum-detail.css" />

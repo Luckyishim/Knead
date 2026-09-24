@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="QuizDetail.aspx.cs" Inherits="KneadLMS.QuizDetail" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="QuizDetail.aspx.cs" Inherits="KneadLMS.QuizDetail" %>
 
 <!DOCTYPE html>
 <html lang="en">

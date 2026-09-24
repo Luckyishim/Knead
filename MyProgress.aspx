@@ -1,4 +1,4 @@
-<%@ Page Title="My Progress - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="MyProgress.aspx.cs" Inherits="KneadLMS.MyProgress" %>
+<%@ Page Title="My Progress - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="MyProgress.aspx.cs" Inherits="KneadLMS.MyProgress" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/my-progress.css" />
@@ -78,7 +78,7 @@
             <ItemTemplate>
               <div class="course-progress-card" style="margin-bottom: 16px;">
                 <div class="course-thumb">
-                  <img src='<%# string.IsNullOrEmpty(Eval("Thumbnail").ToString()) ? "images/momo_dish.jpg" : Eval("Thumbnail") %>' alt='<%# Eval("RecipeTitle") %>' />
+                  <img src='<%# GetImageUrl(Eval("Thumbnail")) %>' alt='<%# Eval("RecipeTitle") %>' />
                 </div>
                 <div class="course-info">
                   <span class="course-category"><%# Eval("CuisineName") %> • <%# Eval("CourseTypeName") %></span>

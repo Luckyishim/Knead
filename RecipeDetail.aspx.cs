@@ -57,22 +57,32 @@ namespace KneadLMS
                     litBreadcrumbCourse.Text = Server.HtmlEncode(row["CourseTypeName"].ToString());
                     ViewState["CuisineID"] = row["CuisineID"];
 
-                    string thumb = row["Thumbnail"].ToString();
-                    imgThumbnail.ImageUrl = string.IsNullOrEmpty(thumb) ? "images/momo_dish.jpg" : thumb;
+                    string thumb = row["Thumbnail"] != null ? row["Thumbnail"].ToString() : "";
+                    imgThumbnail.ImageUrl = GetImageUrl(thumb);
 
                     string videoUrl = row["VideoURL"] != null ? row["VideoURL"].ToString() : "";
-                    ViewState["VideoURL"] = string.IsNullOrEmpty(videoUrl) ? "" : videoUrl;
-                    // Store video URL on the client side as a data attribute so the iframe
-                    // is only created after the user clicks Play (lazy-load).
-                    try
+                    if (!string.IsNullOrEmpty(videoUrl))
                     {
-                        pnlVideoPlayer.Attributes["data-video"] = ViewState["VideoURL"].ToString();
+                        if (videoUrl.Contains("youtube.com/watch?v="))
+                            videoUrl = videoUrl.Replace("watch?v=", "embed/");
+                        else if (videoUrl.Contains("youtu.be/"))
+                            videoUrl = videoUrl.Replace("youtu.be/", "www.youtube.com/embed/");
                     }
-                    catch { }
-                    lnkForumDiscussions.NavigateUrl = "Forums.aspx?recipeId=" + recipeId.ToString();
+                    ViewState["VideoURL"] = string.IsNullOrEmpty(videoUrl) ? "" : videoUrl;
 
-                    litVideoTitle.Text = Server.HtmlEncode(row["RecipeTitle"].ToString());
-                    litVideoDuration.Text = row["Duration"].ToString() + ":00";
+                    if (!string.IsNullOrEmpty(videoUrl))
+                    {
+                        iframeVideo.Attributes["src"] = videoUrl;
+                        pnlVideoSection.Visible = true;
+                        pnlThumbnail.Visible = false;
+                    }
+                    else
+                    {
+                        pnlVideoSection.Visible = false;
+                        pnlThumbnail.Visible = true;
+                    }
+
+                    lnkForumDiscussions.NavigateUrl = "Forums.aspx?recipeId=" + recipeId.ToString();
 
                     string rawIngredients = row["Ingredients"].ToString();
                     if (!string.IsNullOrEmpty(rawIngredients))
@@ -268,6 +278,24 @@ namespace KneadLMS
             {
                 lblStatusMessage.Text = "Error updating favorite: " + ex.Message;
             }
+        }
+
+        public string GetImageUrl(object imagePath)
+        {
+            if (imagePath == null || imagePath == DBNull.Value)
+                return ResolveUrl("~/images/momo_dish.jpg");
+
+            string path = imagePath.ToString().Trim();
+            if (string.IsNullOrEmpty(path))
+                return ResolveUrl("~/images/momo_dish.jpg");
+
+            if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                return path;
+            }
+
+            return ResolveUrl("~/" + path.TrimStart('~', '/'));
         }
     }
 }

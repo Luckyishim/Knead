@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Login.aspx.cs" Inherits="KneadLMS.Login" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="KneadLMS.Login" %>
 
 <!DOCTYPE html>
 <html lang="en">

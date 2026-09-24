@@ -1,4 +1,4 @@
-<%@ Page Title="Quizzes - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="Quizzes.aspx.cs" Inherits="KneadLMS.Quizzes" %>
+<%@ Page Title="Quizzes - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quizzes.aspx.cs" Inherits="KneadLMS.Quizzes" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/quizzes.css" />
@@ -18,7 +18,7 @@
           <div class="cuisine-card" style="display: flex; flex-direction: column; justify-content: space-between; text-align: left; padding: 20px;">
             <div>
               <div class="cuisine-img-box" style="height: 160px; margin-bottom: 12px;">
-                <img src='<%# string.IsNullOrEmpty(Eval("Thumbnail").ToString()) ? "images/momo_dish.jpg" : Eval("Thumbnail") %>' alt='<%# Eval("QuizTitle") %>' />
+                <img src='<%# GetImageUrl(Eval("Thumbnail")) %>' alt='<%# Eval("QuizTitle") %>' />
               </div>
               <span class="badge-tag" style="background: var(--primary-orange-light); color: var(--primary-orange);"><%# Eval("CuisineName") %></span>
               <h4 style="margin-top: 8px; font-size: 16px; font-weight: 700;"><%# Eval("QuizTitle") %></h4>

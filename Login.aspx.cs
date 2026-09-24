@@ -17,7 +17,7 @@ namespace KneadLMS
                 }
                 else
                 {
-                    Response.Redirect("UserDashboard.aspx");
+                    Response.Redirect("Default.aspx");
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace KneadLMS
                         }
                         else
                         {
-                            Response.Redirect("UserDashboard.aspx");
+                            Response.Redirect("Default.aspx");
                         }
                     }
                     else

@@ -232,3 +232,6 @@ SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME IN ('Cuisine', 'CourseType', 'Recipe', 'RecipeStep', 'Quiz', 'QuizQuestion')
 ORDER BY TABLE_NAME, ORDINAL_POSITION;
+
+SELECT RecipeID, RecipeTitle, Thumbnail, VideoURL FROM Recipe;
+SELECT CuisineID, CuisineName, ImageURL FROM Cuisine;

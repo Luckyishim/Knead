@@ -73,5 +73,23 @@ namespace KneadLMS
                 pnlNoSaved.Visible = true;
             }
         }
+
+        public string GetImageUrl(object imagePath)
+        {
+            if (imagePath == null || imagePath == DBNull.Value)
+                return ResolveUrl("~/images/momo_dish.jpg");
+
+            string path = imagePath.ToString().Trim();
+            if (string.IsNullOrEmpty(path))
+                return ResolveUrl("~/images/momo_dish.jpg");
+
+            if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                return path;
+            }
+
+            return ResolveUrl("~/" + path.TrimStart('~', '/'));
+        }
     }
 }

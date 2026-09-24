@@ -873,6 +873,21 @@ namespace KneadLMS
             string desc = txtNewCuisineDesc.Text.Trim();
             string img  = txtNewCuisineImg.Text.Trim();
 
+            if (!string.IsNullOrEmpty(img))
+            {
+                img = img.TrimStart('~', '/');
+                if (!img.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                    !img.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                    !img.StartsWith("images/", StringComparison.OrdinalIgnoreCase))
+                {
+                    img = "images/" + img;
+                }
+            }
+            else
+            {
+                img = "images/momo_dish.jpg";
+            }
+
             if (string.IsNullOrEmpty(name))
             {
                 ShowAdminMsg("Cuisine Name is required.", false);
@@ -985,6 +1000,32 @@ namespace KneadLMS
             string difficulty   = ddlRecipeDifficulty.SelectedValue;
             string thumb        = txtRecipeThumb.Text.Trim();
             string video        = txtRecipeVideo.Text.Trim();
+
+            // Normalize thumbnail path
+            if (!string.IsNullOrEmpty(thumb))
+            {
+                thumb = thumb.TrimStart('~', '/');
+                if (!thumb.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                    !thumb.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                    !thumb.StartsWith("images/", StringComparison.OrdinalIgnoreCase) &&
+                    !thumb.StartsWith("uploads/", StringComparison.OrdinalIgnoreCase))
+                {
+                    thumb = "images/" + thumb;
+                }
+            }
+            else
+            {
+                thumb = "images/momo_dish.jpg";
+            }
+
+            // Normalize YouTube URL
+            if (!string.IsNullOrEmpty(video))
+            {
+                if (video.Contains("youtube.com/watch?v="))
+                    video = video.Replace("watch?v=", "embed/");
+                else if (video.Contains("youtu.be/"))
+                    video = video.Replace("youtu.be/", "www.youtube.com/embed/");
+            }
 
             if (string.IsNullOrEmpty(title))
             {

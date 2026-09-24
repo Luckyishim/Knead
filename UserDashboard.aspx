@@ -1,4 +1,4 @@
-<%@ Page Title="User Dashboard - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeFile="UserDashboard.aspx.cs" Inherits="KneadLMS.UserDashboard" %>
+<%@ Page Title="User Dashboard - knead. Culinary LMS" Language="C#" MasterPageFile="~/Profile.Master" AutoEventWireup="true" CodeBehind="UserDashboard.aspx.cs" Inherits="KneadLMS.UserDashboard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/user-dashboard.css" />
@@ -73,7 +73,7 @@
         <p style="margin-top: 4px;">Ready to master some new dishes today?</p>
       </div>
 
-      <!-- Key Metrics Stats Row -->
+      <!-- Key Metrics Stats Row (4 in a single row) -->
       <div class="dashboard-stats-grid">
         <div class="dashboard-stat-card">
           <div class="stat-card-top">
@@ -82,7 +82,7 @@
             </svg>
             Cuisines in Progress
           </div>
-          <div class="stat-card-value"><asp:Literal ID="litCuisinesInProgress" runat="server">3</asp:Literal></div>
+          <div class="stat-card-value"><asp:Literal ID="litCuisinesInProgress" runat="server">0</asp:Literal></div>
         </div>
 
         <div class="dashboard-stat-card">
@@ -95,7 +95,7 @@
             </svg>
             Tutorials Completed
           </div>
-          <div class="stat-card-value"><asp:Literal ID="litCompletedCount" runat="server">12</asp:Literal></div>
+          <div class="stat-card-value"><asp:Literal ID="litCompletedCount" runat="server">0</asp:Literal></div>
         </div>
 
         <div class="dashboard-stat-card">
@@ -110,7 +110,7 @@
             </svg>
             Quiz Avg Score
           </div>
-          <div class="stat-card-value"><asp:Literal ID="litAvgQuizScore" runat="server">92%</asp:Literal></div>
+          <div class="stat-card-value"><asp:Literal ID="litAvgQuizScore" runat="server">N/A</asp:Literal></div>
         </div>
 
         <div class="dashboard-stat-card">
@@ -120,11 +120,11 @@
             </svg>
             Forum Posts
           </div>
-          <div class="stat-card-value"><asp:Literal ID="litForumTopicCount" runat="server">8</asp:Literal></div>
+          <div class="stat-card-value"><asp:Literal ID="litForumTopicCount" runat="server">0</asp:Literal></div>
         </div>
       </div>
 
-      <!-- Main Split Content Area -->
+      <!-- Main Split Content Area: Continue Learning (left) + Progress by Cuisine (right) -->
       <div class="dashboard-content-split">
         
         <!-- Left: Continue Learning -->
@@ -136,7 +136,7 @@
               <ItemTemplate>
                 <div class="course-progress-card">
                   <div class="course-thumb">
-                    <img src='<%# string.IsNullOrEmpty(Eval("Thumbnail").ToString()) ? "images/momo_dish.jpg" : Eval("Thumbnail") %>' alt='<%# Eval("RecipeTitle") %>' />
+                    <img src='<%# GetImageUrl(Eval("Thumbnail")) %>' alt='<%# Eval("RecipeTitle") %>' />
                   </div>
                   <div class="course-info">
                     <span class="course-category"><%# Eval("CuisineName") %></span>

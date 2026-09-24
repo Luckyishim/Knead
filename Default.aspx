@@ -1,4 +1,4 @@
-<%@ Page Title="Home - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="KneadLMS.DefaultPage" %>
+<%@ Page Title="Home - knead. Culinary LMS" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="KneadLMS.DefaultPage" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="styles/default.css" />
@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="hero-image-wrapper">
-      <img src="images/hero_cooking.jpg" alt="Passionate home cooks preparing meals together in a modern kitchen" />
+      <img src='<%= ResolveUrl("~/images/hero_cooking.jpg") %>' alt="Passionate home cooks preparing meals together in a modern kitchen" />
     </div>
   </section>
 
@@ -59,7 +59,7 @@
         <ItemTemplate>
           <a href='<%# "ItemList.aspx?cuisineId=" + Eval("CuisineID") %>' class="cuisine-card">
             <div class="cuisine-img-box">
-              <img src='<%# Eval("ImageURL") %>' alt='<%# Eval("CuisineName") %>' />
+              <img src='<%# GetImageUrl(Eval("ImageURL")) %>' alt='<%# Eval("CuisineName") %>' />
             </div>
             <h4><%# Eval("CuisineName") %></h4>
           </a>
