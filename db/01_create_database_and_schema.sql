@@ -235,3 +235,5 @@ ORDER BY TABLE_NAME, ORDINAL_POSITION;
 
 SELECT RecipeID, RecipeTitle, Thumbnail, VideoURL FROM Recipe;
 SELECT CuisineID, CuisineName, ImageURL FROM Cuisine;
+
+SELECT UserID, FullName, Email, PasswordHash FROM Users
